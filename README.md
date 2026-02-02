@@ -387,9 +387,9 @@ Special thanks to all contributors and users who have provided feedback, reporte
 ### Author
 
 **Your Name**
-- GitHub: [@YOUR-USERNAME](https://github.com/YOUR-USERNAME)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/your-profile)
-- Email: your.email@example.com
+- GitHub: [@petercwilson](https://github.com/petercwilson)
+- LinkedIn: [pcwilson19](https://www.linkedin.com/in/pcwilson19/)
+- Email: pcwilson19@gmail.com
 
 ### Issues & Questions
 
