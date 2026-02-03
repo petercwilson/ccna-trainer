@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const DeviceIcon = ({ type }) => {
+export const DeviceIcon = ({ type, size = 28 }) => {
   const getLabel = () => {
     switch(type) {
       case 'router': return 'Router';
@@ -12,7 +12,7 @@ export const DeviceIcon = ({ type }) => {
   };
 
   if (type === 'router') return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" role="img" aria-label={getLabel()}>
+    <svg width={size} height={size} viewBox="0 0 28 28" fill="none" role="img" aria-label={getLabel()}>
       <rect x="3" y="9" width="22" height="10" rx="2" stroke="#f2c434" strokeWidth="1.8" fill="none"/>
       <circle cx="8" cy="14" r="2" fill="#f2c434"/><circle cx="14" cy="14" r="2" fill="#f2c434"/><circle cx="20" cy="14" r="2" fill="#1ea86a"/>
       <line x1="7" y1="9" x2="7" y2="5" stroke="#f2c434" strokeWidth="1.6" strokeLinecap="round"/>
@@ -23,7 +23,7 @@ export const DeviceIcon = ({ type }) => {
   );
 
   if (type === 'switch') return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" role="img" aria-label={getLabel()}>
+    <svg width={size} height={size} viewBox="0 0 28 28" fill="none" role="img" aria-label={getLabel()}>
       <rect x="3" y="10" width="22" height="8" rx="2" stroke="#f2c434" strokeWidth="1.8" fill="none"/>
       {[6,9,12,15,18,21].map((x,i) => <rect key={i} x={x-1} y="12.5" width="2" height="5" rx=".8" fill={i<4?'#f2c434':'#7a95b0'}/>)}
       <line x1="6" y1="10" x2="6" y2="6" stroke="#f2c434" strokeWidth="1.5" strokeLinecap="round"/>
@@ -34,7 +34,7 @@ export const DeviceIcon = ({ type }) => {
   );
 
   if (type === 'pc') return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" role="img" aria-label={getLabel()}>
+    <svg width={size} height={size} viewBox="0 0 28 28" fill="none" role="img" aria-label={getLabel()}>
       <rect x="4" y="3" width="20" height="14" rx="2" stroke="#f2c434" strokeWidth="1.8" fill="none"/>
       <rect x="6" y="5" width="16" height="10" rx=".8" fill="#011839"/>
       <rect x="11" y="17" width="6" height="3" fill="#7a95b0"/>
@@ -44,7 +44,7 @@ export const DeviceIcon = ({ type }) => {
   );
 
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" role="img" aria-label={getLabel()}>
+    <svg width={size} height={size} viewBox="0 0 28 28" fill="none" role="img" aria-label={getLabel()}>
       <rect x="7" y="2" width="14" height="6" rx="1.5" stroke="#f2c434" strokeWidth="1.5" fill="none"/>
       <rect x="7" y="11" width="14" height="6" rx="1.5" stroke="#f2c434" strokeWidth="1.5" fill="none"/>
       <rect x="7" y="20" width="14" height="6" rx="1.5" stroke="#f2c434" strokeWidth="1.5" fill="none"/>

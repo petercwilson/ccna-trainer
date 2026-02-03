@@ -18,6 +18,7 @@ export const PacketTracer = () => {
 
   // Add device to topology
   const addDevice = useCallback((type, position) => {
+    console.log('Adding device:', type, 'at position:', position);
     const newDevice = {
       id: `${type}-${Date.now()}`,
       type,
@@ -41,7 +42,11 @@ export const PacketTracer = () => {
       }
     };
 
-    setDevices(prev => [...prev, newDevice]);
+    setDevices(prev => {
+      const updated = [...prev, newDevice];
+      console.log('Devices after add:', updated.length, updated);
+      return updated;
+    });
     simulator.addDevice(newDevice);
     return newDevice;
   }, [devices.length, simulator]);

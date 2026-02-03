@@ -21,14 +21,18 @@ export const TopologyCanvas = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const canvasRef = useRef(null);
 
+  console.log('TopologyCanvas render - devices:', devices.length, 'connections:', connections.length);
+
   // Handle canvas click for adding devices
   const handleCanvasClick = useCallback((e) => {
+    console.log('Canvas clicked, mode:', mode);
     if (mode === 'select' || mode === 'cable') return;
 
     const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    console.log('Adding device at:', x, y);
     onDeviceAdd(mode, { x, y });
     setMode('select'); // Return to select mode after adding
   }, [mode, onDeviceAdd]);
@@ -298,11 +302,45 @@ export const TopologyCanvas = ({
               )}
 
               {/* Device icon */}
-              <foreignObject x="5" y="5" width="50" height="50">
-                <div className="device-icon-wrapper">
-                  <DeviceIcon type={device.type} size={40} />
-                </div>
-              </foreignObject>
+              <g transform="translate(30, 30) scale(2.5)">
+                {device.type === 'router' && (
+                  <>
+                    <rect x="-12" y="-5" width="24" height="10" rx="2" stroke="#f2c434" strokeWidth="2.5" fill="#004d73"/>
+                    <circle cx="-7" cy="0" r="2" fill="#f2c434"/>
+                    <circle cx="0" cy="0" r="2" fill="#f2c434"/>
+                    <circle cx="7" cy="0" r="2" fill="#1ea86a"/>
+                  </>
+                )}
+                {device.type === 'switch' && (
+                  <>
+                    <rect x="-12" y="-4" width="24" height="8" rx="2" stroke="#f2c434" strokeWidth="2.5" fill="#004d73"/>
+                    <rect x="-9" y="-1.5" width="2" height="3" rx=".8" fill="#f2c434"/>
+                    <rect x="-5" y="-1.5" width="2" height="3" rx=".8" fill="#f2c434"/>
+                    <rect x="-1" y="-1.5" width="2" height="3" rx=".8" fill="#f2c434"/>
+                    <rect x="3" y="-1.5" width="2" height="3" rx=".8" fill="#f2c434"/>
+                    <rect x="7" y="-1.5" width="2" height="3" rx=".8" fill="#7a95b0"/>
+                  </>
+                )}
+                {device.type === 'pc' && (
+                  <>
+                    <rect x="-10" y="-8" width="20" height="14" rx="2" stroke="#f2c434" strokeWidth="2.5" fill="#004d73"/>
+                    <rect x="-8" y="-6" width="16" height="10" rx=".8" fill="#0076a9"/>
+                    <rect x="-3" y="6" width="6" height="3" fill="#7a95b0"/>
+                    <rect x="-6" y="9" width="12" height="2.8" rx="1.4" stroke="#f2c434" strokeWidth="2" fill="#004d73"/>
+                    <circle cx="0" cy="-2" r="2.5" fill="#f2c434" opacity="0.8"/>
+                  </>
+                )}
+                {device.type === 'server' && (
+                  <>
+                    <rect x="-7" y="-12" width="14" height="6" rx="1.5" stroke="#f2c434" strokeWidth="2" fill="#004d73"/>
+                    <rect x="-7" y="-3" width="14" height="6" rx="1.5" stroke="#f2c434" strokeWidth="2" fill="#004d73"/>
+                    <rect x="-7" y="6" width="14" height="6" rx="1.5" stroke="#f2c434" strokeWidth="2" fill="#004d73"/>
+                    <circle cx="-3" cy="-9" r="1.5" fill="#1ea86a"/>
+                    <circle cx="-3" cy="0" r="1.5" fill="#1ea86a"/>
+                    <circle cx="-3" cy="9" r="1.5" fill="#e8a012"/>
+                  </>
+                )}
+              </g>
 
               {/* Device label */}
               <text
