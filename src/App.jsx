@@ -128,27 +128,6 @@ const topoLinks = [
 /* ══════════════════════════ STYLES ════════════════════════════ */
 const STYLE = `
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
-@font-face {
-  font-family: 'Liberator';
-  src: url('/fonts/Liberator-Heavy.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Liberator';
-  src: url('/fonts/Liberator-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Liberator';
-  src: url('/fonts/Liberator-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
 
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
@@ -692,6 +671,36 @@ export default function CCNATrainer() {
     try{ const s=localStorage.getItem('ccna-progress'); return s?JSON.parse(s):{}; } catch(e){ return {}; }
   });
   useEffect(()=>{ localStorage.setItem('ccna-progress', JSON.stringify(progress)); }, [progress]);
+
+  useEffect(()=>{
+    const tag = document.createElement('style');
+    tag.id = 'liberator-fonts';
+    tag.textContent = `
+      @font-face {
+        font-family: 'Liberator';
+        src: url('/fonts/Liberator-Heavy.ttf') format('truetype');
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Liberator';
+        src: url('/fonts/Liberator-Medium.ttf') format('truetype');
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Liberator';
+        src: url('/fonts/Liberator-Light.ttf') format('truetype');
+        font-weight: 300;
+        font-style: normal;
+        font-display: swap;
+      }
+    `;
+    document.head.appendChild(tag);
+    return ()=>{ document.head.removeChild(tag); };
+  }, []);
 
   const filteredQs = examQuestions.filter(q => q.category === cat);
   const startExam = () => {
