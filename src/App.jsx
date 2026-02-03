@@ -1,1017 +1,931 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, Network, FileText, BarChart3, Check, X, RefreshCw, Award, ChevronDown, Clock, Target, Zap, ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
-/* ─── DATA ─── */
+/* ══════════════════════════ DATA ══════════════════════════════ */
 const studyGuides = {
   'network-fundamentals': {
     title: 'Network Fundamentals',
-    icon: '🌐',
-    color: '#06b6d4',
     topics: [
-      {
-        id: 'osi-model',
-        title: 'OSI Model & TCP/IP',
-        content: `The OSI (Open Systems Interconnection) model is a conceptual framework that standardizes network communication into 7 layers:
-
-**Layer 7 - Application**: End-user protocols (HTTP, FTP, SMTP, DNS)
-**Layer 6 - Presentation**: Data translation, encryption, compression
-**Layer 5 - Session**: Session management and synchronization
-**Layer 4 - Transport**: End-to-end communication (TCP, UDP)
-**Layer 3 - Network**: Routing and logical addressing (IP)
-**Layer 2 - Data Link**: Frame switching and physical addressing (MAC)
-**Layer 1 - Physical**: Transmission of raw bits over physical medium
-
-**TCP/IP Model** (4 layers):
-- Application (combines OSI 5-7)
-- Transport (OSI 4)
-- Internet (OSI 3)
-- Network Access (OSI 1-2)
-
-**Key Protocols by Layer:**
-- Application: HTTP(S), FTP, SMTP, DNS, DHCP, SNMP
-- Transport: TCP (connection-oriented), UDP (connectionless)
-- Network: IP, ICMP, ARP, OSPF, EIGRP
-- Data Link: Ethernet, PPP, Frame Relay`
+      { id: 'osi-model', title: 'OSI Model & TCP/IP',
+        content: [
+          { type:'heading', text:'OSI Model — 7 Layers' },
+          { type:'rows', rows:[
+            ['Layer 7','Application','HTTP, FTP, SMTP, DNS'],
+            ['Layer 6','Presentation','Encryption, compression'],
+            ['Layer 5','Session','Session management'],
+            ['Layer 4','Transport','TCP, UDP'],
+            ['Layer 3','Network','IP routing, logical addressing'],
+            ['Layer 2','Data Link','MAC, frame switching'],
+            ['Layer 1','Physical','Raw bit transmission'],
+          ]},
+          { type:'heading', text:'TCP/IP Model — 4 Layers' },
+          { type:'list', items:['Application (OSI 5–7)','Transport (OSI 4)','Internet (OSI 3)','Network Access (OSI 1–2)'] },
+          { type:'heading', text:'Key Protocols' },
+          { type:'list', items:['Application: HTTP(S), FTP, SMTP, DNS, DHCP, SNMP','Transport: TCP (connection-oriented), UDP (connectionless)','Network: IP, ICMP, ARP, OSPF, EIGRP','Data Link: Ethernet, PPP, Frame Relay'] },
+        ]
       },
-      {
-        id: 'ip-addressing',
-        title: 'IP Addressing & Subnetting',
-        content: `**IPv4 Address Structure:**
-- 32-bit address divided into 4 octets (e.g., 192.168.1.1)
-- Network portion + Host portion
-- Subnet mask determines network/host boundary
-
-**Address Classes:**
-- Class A: 1.0.0.0 to 126.255.255.255 (/8)
-- Class B: 128.0.0.0 to 191.255.255.255 (/16)
-- Class C: 192.0.0.0 to 223.255.255.255 (/24)
-
-**Private IP Ranges:**
-- 10.0.0.0/8 (Class A)
-- 172.16.0.0/12 (Class B)
-- 192.168.0.0/16 (Class C)
-
-**Subnetting Basics:**
-CIDR Notation: /24 = 255.255.255.0
-- /24 = 256 addresses (254 usable)
-- /25 = 128 addresses (126 usable)
-- /26 = 64 addresses (62 usable)
-- /27 = 32 addresses (30 usable)
-- /28 = 16 addresses (14 usable)
-- /29 = 8 addresses (6 usable)
-- /30 = 4 addresses (2 usable - point-to-point links)`
+      { id: 'ip-addressing', title: 'IP Addressing & Subnetting',
+        content: [
+          { type:'heading', text:'IPv4 Structure' },
+          { type:'list', items:['32-bit address in 4 octets (e.g. 192.168.1.1)','Network portion + Host portion','Subnet mask sets the boundary'] },
+          { type:'heading', text:'Private IP Ranges' },
+          { type:'rows', rows:[['10.0.0.0/8','Class A','Large networks'],['172.16.0.0/12','Class B','Medium networks'],['192.168.0.0/16','Class C','Small networks']] },
+          { type:'heading', text:'Subnet Quick Reference' },
+          { type:'rows', rows:[['/ 24','256 addr','254 usable'],['/ 25','128 addr','126 usable'],['/ 26','64 addr','62 usable'],['/ 27','32 addr','30 usable'],['/ 28','16 addr','14 usable'],['/ 29','8 addr','6 usable'],['/ 30','4 addr','2 usable (P2P)']] },
+        ]
       }
     ]
   },
   'routing': {
     title: 'IP Routing',
-    icon: '🔀',
-    color: '#10b981',
-    topics: [
-      {
-        id: 'routing-basics',
-        title: 'Routing Fundamentals',
-        content: `**Routing Process:**
-1. Router receives packet on incoming interface
-2. De-encapsulates Layer 2 frame
-3. Examines destination IP address
-4. Consults routing table for best match
-5. Encapsulates in new Layer 2 frame
-6. Forwards out appropriate interface
-
-**Administrative Distances (Lower = More Trusted):**
-- Directly Connected: 0
-- Static Route: 1
-- EIGRP Summary: 5
-- eBGP: 20
-- EIGRP (internal): 90
-- OSPF: 110
-- RIP: 120`
-      }
-    ]
+    topics: [{ id:'routing-basics', title:'Routing Fundamentals',
+      content: [
+        { type:'heading', text:'Routing Process' },
+        { type:'list', items:['1. Receive packet on incoming interface','2. De-encapsulate Layer 2 frame','3. Examine destination IP','4. Consult routing table → best match','5. Encapsulate in new L2 frame','6. Forward out the correct interface'] },
+        { type:'heading', text:'Administrative Distance (lower = trusted)' },
+        { type:'rows', rows:[['Directly Connected','0','Most trusted'],['Static Route','1','Manual'],['EIGRP Summary','5',''],['eBGP','20','External'],['EIGRP Internal','90',''],['OSPF','110','Link-state'],['RIP','120','Distance vector']] },
+      ]
+    }]
   },
   'switching': {
     title: 'Switching Technologies',
-    icon: '🔄',
-    color: '#f59e0b',
-    topics: [
-      {
-        id: 'vlans',
-        title: 'VLANs & Trunking',
-        content: `**VLAN Benefits:**
-- Segmentation of broadcast domains
-- Improved security through isolation
-- Simplified management and troubleshooting
-- Flexibility in network design
-
-**VLAN Types:**
-- Data VLAN: User traffic
-- Voice VLAN: IP phone traffic (QoS priority)
-- Management VLAN: Switch management
-- Native VLAN: Untagged frames on trunk (default VLAN 1)
-
-**Trunking:**
-- Carries multiple VLANs over single link
-- 802.1Q: Industry standard, single native VLAN`
-      }
-    ]
+    topics: [{ id:'vlans', title:'VLANs & Trunking',
+      content: [
+        { type:'heading', text:'VLAN Benefits' },
+        { type:'list', items:['Broadcast domain segmentation','Security through isolation','Simplified management','Flexible network design'] },
+        { type:'heading', text:'VLAN Types' },
+        { type:'rows', rows:[['Data VLAN','User traffic','Standard'],['Voice VLAN','IP phones','QoS priority'],['Management VLAN','Switch mgmt','Isolated'],['Native VLAN','Untagged trunk','Default: VLAN 1']] },
+        { type:'heading', text:'Trunking' },
+        { type:'list', items:['Carries multiple VLANs on one link','802.1Q — industry standard, single native VLAN'] },
+      ]
+    }]
   },
   'security': {
     title: 'Network Security',
-    icon: '🔒',
-    color: '#ef4444',
-    topics: [
-      {
-        id: 'acls',
-        title: 'Access Control Lists (ACLs)',
-        content: `**ACL Types:**
-
-**Standard ACLs (1-99, 1300-1999):**
-- Filter based on source IP only
-- Applied close to destination
-
-**Extended ACLs (100-199, 2000-2699):**
-- Filter on source/destination IP, protocol, port
-- Applied close to source
-
-**Common Port Numbers:**
-- FTP: 20/21
-- SSH: 22
-- Telnet: 23
-- HTTP: 80
-- HTTPS: 443`
-      }
-    ]
+    topics: [{ id:'acls', title:'Access Control Lists (ACLs)',
+      content: [
+        { type:'heading', text:'ACL Types' },
+        { type:'rows', rows:[['Standard','1–99, 1300–1999','Source IP only — apply near destination'],['Extended','100–199, 2000–2699','Src/Dst IP, protocol, port — apply near source']] },
+        { type:'heading', text:'Common Port Numbers' },
+        { type:'rows', rows:[['FTP','20 / 21','File transfer'],['SSH','22','Secure shell'],['Telnet','23','Remote access'],['HTTP','80','Web'],['HTTPS','443','Secure web']] },
+      ]
+    }]
   },
   'automation': {
     title: 'Network Automation',
-    icon: '🤖',
-    color: '#8b5cf6',
-    topics: [
-      {
-        id: 'rest-apis',
-        title: 'REST APIs & JSON',
-        content: `**REST (Representational State Transfer):**
-
-**HTTP Methods:**
-- GET: Retrieve data (read-only)
-- POST: Create new resource
-- PUT: Update existing resource
-- DELETE: Remove resource
-
-**JSON (JavaScript Object Notation):**
-Human-readable data format used in REST APIs.
-Consists of key-value pairs and supports nested objects.`
-      }
-    ]
+    topics: [{ id:'rest-apis', title:'REST APIs & JSON',
+      content: [
+        { type:'heading', text:'HTTP Methods' },
+        { type:'rows', rows:[['GET','Retrieve data','Read-only, idempotent'],['POST','Create resource','New entry'],['PUT','Update resource','Replace entry'],['DELETE','Remove resource','Permanent']] },
+        { type:'heading', text:'JSON' },
+        { type:'list', items:['Human-readable key-value format','Used in REST APIs','Supports nested objects & arrays'] },
+      ]
+    }]
   },
   'wireless': {
     title: 'Wireless Networking',
-    icon: '📡',
-    color: '#ec4899',
-    topics: [
-      {
-        id: 'wireless-fundamentals',
-        title: 'Wireless Fundamentals',
-        content: `**802.11 Standards:**
-- 802.11n (Wi-Fi 4): 2.4/5 GHz, 600 Mbps, MIMO
-- 802.11ac (Wi-Fi 5): 5 GHz, 6.9 Gbps, MU-MIMO
-- 802.11ax (Wi-Fi 6): 2.4/5 GHz, 9.6 Gbps, OFDMA
-
-**Frequency Bands:**
-- 2.4 GHz: 14 channels (1-14), longer range, more interference
-- 5 GHz: UNII bands, more channels, less interference
-
-**Wireless Security:**
-- WEP: Deprecated, easily cracked
-- WPA2: AES/CCMP, current standard
-- WPA3: Enhanced security, SAE`
-      }
-    ]
-  }
+    topics: [{ id:'wireless-fund', title:'Wireless Fundamentals',
+      content: [
+        { type:'heading', text:'802.11 Standards' },
+        { type:'rows', rows:[['Wi-Fi 4','802.11n','2.4 / 5 GHz — 600 Mbps'],['Wi-Fi 5','802.11ac','5 GHz only — 6.9 Gbps'],['Wi-Fi 6','802.11ax','2.4 / 5 GHz — 9.6 Gbps']] },
+        { type:'heading', text:'Frequency Bands' },
+        { type:'list', items:['2.4 GHz: 14 channels, longer range, more interference','5 GHz: many channels, less interference, shorter range'] },
+        { type:'heading', text:'Security Protocols' },
+        { type:'rows', rows:[['WEP','Deprecated','Easily cracked'],['WPA2','AES / CCMP','Current standard'],['WPA3','SAE','Next-gen, enhanced']] },
+      ]
+    }]
+  },
 };
 
 const examQuestions = [
-  { id: 1, category: 'network-fundamentals', difficulty: 'easy', question: 'At which OSI layer does a router operate?', options: ['Layer 1 (Physical)', 'Layer 2 (Data Link)', 'Layer 3 (Network)', 'Layer 4 (Transport)'], correctAnswer: 2, explanation: 'Routers operate at Layer 3 (Network layer) of the OSI model. They make forwarding decisions based on IP addresses and maintain routing tables.' },
-  { id: 2, category: 'network-fundamentals', difficulty: 'medium', question: 'What is the maximum number of usable host addresses in a /26 subnet?', options: ['30', '62', '126', '254'], correctAnswer: 1, explanation: 'A /26 subnet has 6 host bits (32 - 26 = 6). This gives us 2^6 = 64 total addresses. Subtracting 2 for network and broadcast: 64 - 2 = 62 usable host addresses.' },
-  { id: 3, category: 'network-fundamentals', difficulty: 'easy', question: 'Which protocol uses UDP port 69?', options: ['FTP', 'TFTP', 'HTTP', 'Telnet'], correctAnswer: 1, explanation: 'TFTP (Trivial File Transfer Protocol) uses UDP port 69. It is a simplified protocol used primarily for transferring configuration files and IOS images.' },
-  { id: 4, category: 'switching', difficulty: 'medium', question: 'What is the default STP port state for a port that will neither forward frames nor learn MAC addresses?', options: ['Disabled', 'Blocking', 'Listening', 'Learning'], correctAnswer: 1, explanation: 'Blocking is the STP state where a port receives BPDUs but does not forward frames or learn MAC addresses. This prevents loops while maintaining the ability to transition to forwarding if the topology changes.' },
-  { id: 5, category: 'switching', difficulty: 'hard', question: 'Which command configures an interface to allow only VLANs 10, 20, and 30 on a trunk?', options: ['switchport trunk vlan 10,20,30', 'switchport trunk allowed vlan 10,20,30', 'switchport trunk permit vlan 10,20,30', 'vlan trunk allowed 10,20,30'], correctAnswer: 1, explanation: 'The correct command is "switchport trunk allowed vlan 10,20,30". This explicitly permits only VLANs 10, 20, and 30 to traverse the trunk link.' },
-  { id: 6, category: 'routing', difficulty: 'medium', question: 'What is the administrative distance of OSPF?', options: ['90', '100', '110', '120'], correctAnswer: 2, explanation: 'OSPF has an administrative distance of 110. Administrative distance determines the trustworthiness of routing information sources. Lower values are preferred.' },
-  { id: 7, category: 'routing', difficulty: 'hard', question: 'In EIGRP, what condition must be met for a route to be considered a feasible successor?', options: ['The reported distance must be less than the feasible distance', 'The feasible distance must be less than the reported distance', 'The metric must be equal to the successor metric', 'The administrative distance must be lower than OSPF'], correctAnswer: 0, explanation: 'For EIGRP feasibility condition: Reported Distance (RD) < Feasible Distance (FD). The RD is the neighbor\'s best metric to the destination. If this condition is met, the route is loop-free.' },
-  { id: 8, category: 'switching', difficulty: 'medium', question: 'Which VLAN is the default native VLAN on Cisco switches?', options: ['VLAN 0', 'VLAN 1', 'VLAN 10', 'VLAN 1005'], correctAnswer: 1, explanation: 'VLAN 1 is the default native VLAN. The native VLAN carries untagged frames on a trunk link. Best practice is to change the native VLAN to prevent VLAN hopping attacks.' },
-  { id: 9, category: 'security', difficulty: 'medium', question: 'What is the effect of configuring port security violation mode as "restrict"?', options: ['Port shuts down and requires manual intervention', 'Packets are dropped and violations are logged', 'All traffic is allowed but logged', 'Port security is disabled'], correctAnswer: 1, explanation: 'In "restrict" mode, packets from unauthorized MAC addresses are dropped, violations are logged, SNMP traps are sent - but the port stays operational.' },
-  { id: 10, category: 'security', difficulty: 'hard', question: 'Which security feature requires DHCP snooping to be enabled first?', options: ['Port security', 'Dynamic ARP Inspection (DAI)', 'PortFast', 'BPDU Guard'], correctAnswer: 1, explanation: 'Dynamic ARP Inspection (DAI) relies on the DHCP snooping binding database to validate ARP packets and prevent ARP spoofing attacks.' },
-  { id: 11, category: 'wireless', difficulty: 'medium', question: 'Which wireless standard operates exclusively in the 5 GHz band and supports up to 6.9 Gbps?', options: ['802.11n (Wi-Fi 4)', '802.11ac (Wi-Fi 5)', '802.11ax (Wi-Fi 6)', '802.11g'], correctAnswer: 1, explanation: '802.11ac (Wi-Fi 5) operates exclusively in the 5 GHz band and supports speeds up to 6.9 Gbps using features like wider channels and MU-MIMO.' },
-  { id: 12, category: 'automation', difficulty: 'medium', question: 'Which HTTP method is used to retrieve data from a REST API without modifying it?', options: ['POST', 'PUT', 'GET', 'DELETE'], correctAnswer: 2, explanation: 'GET is the HTTP method used to retrieve data from a REST API without making any changes. It\'s idempotent - multiple identical requests have the same effect as one.' }
+  { id:1,  category:'network-fundamentals', difficulty:'easy',   question:'At which OSI layer does a router operate?',                                          options:['Layer 1 (Physical)','Layer 2 (Data Link)','Layer 3 (Network)','Layer 4 (Transport)'],                                                   correctAnswer:2, explanation:'Routers operate at Layer 3 (Network). They forward packets based on destination IP and maintain routing tables.' },
+  { id:2,  category:'network-fundamentals', difficulty:'medium', question:'How many usable host addresses are in a /26 subnet?',                              options:['30','62','126','254'],                                                                                                                          correctAnswer:1, explanation:'A /26 has 6 host bits → 2⁶ = 64 addresses. Minus network + broadcast = 62 usable hosts.' },
+  { id:3,  category:'network-fundamentals', difficulty:'easy',   question:'Which protocol uses UDP port 69?',                                                 options:['FTP','TFTP','HTTP','Telnet'],                                                                                                                    correctAnswer:1, explanation:'TFTP (Trivial File Transfer Protocol) uses UDP port 69 for config and IOS image transfers.' },
+  { id:4,  category:'switching',            difficulty:'medium', question:'What STP port state neither forwards frames nor learns MACs?',                     options:['Disabled','Blocking','Listening','Learning'],                                                                                                   correctAnswer:1, explanation:'Blocking receives BPDUs but does not forward or learn — it prevents loops until topology changes.' },
+  { id:5,  category:'switching',            difficulty:'hard',   question:'Which command restricts a trunk to VLANs 10, 20 and 30?',                        options:['switchport trunk vlan 10,20,30','switchport trunk allowed vlan 10,20,30','switchport trunk permit vlan 10,20,30','vlan trunk allowed 10,20,30'], correctAnswer:1, explanation:'"switchport trunk allowed vlan 10,20,30" explicitly permits only those VLANs on the trunk.' },
+  { id:6,  category:'routing',              difficulty:'medium', question:'What is the administrative distance of OSPF?',                                     options:['90','100','110','120'],                                                                                                                         correctAnswer:2, explanation:'OSPF = 110. Lower AD is more trusted: Connected 0, Static 1, EIGRP 90, OSPF 110, RIP 120.' },
+  { id:7,  category:'routing',              difficulty:'hard',   question:'What must be true for an EIGRP route to be a feasible successor?',               options:['Reported Distance < Feasible Distance','Feasible Distance < Reported Distance','Metric equals successor metric','AD lower than OSPF'],           correctAnswer:0, explanation:'Feasibility condition: RD < FD. This guarantees the route is loop-free and can serve as a backup path.' },
+  { id:8,  category:'switching',            difficulty:'medium', question:'What is the default native VLAN on Cisco switches?',                             options:['VLAN 0','VLAN 1','VLAN 10','VLAN 1005'],                                                                                                        correctAnswer:1, explanation:'VLAN 1 is the default native VLAN. Best practice: change it to an unused VLAN to prevent hopping attacks.' },
+  { id:9,  category:'security',             difficulty:'medium', question:'What happens in port security "restrict" violation mode?',                       options:['Port shuts down, needs manual fix','Packets dropped + violation logged','All traffic allowed but logged','Port security disabled'],           correctAnswer:1, explanation:'Restrict drops bad packets, logs violations, and sends SNMP traps — but keeps the port up.' },
+  { id:10, category:'security',             difficulty:'hard',   question:'Which feature depends on DHCP snooping being enabled?',                         options:['Port Security','Dynamic ARP Inspection (DAI)','PortFast','BPDU Guard'],                                                                      correctAnswer:1, explanation:'DAI uses the DHCP snooping binding table to validate ARP packets and stop ARP spoofing.' },
+  { id:11, category:'wireless',             difficulty:'medium', question:'Which 802.11 standard is 5 GHz-only and reaches 6.9 Gbps?',                    options:['802.11n (Wi-Fi 4)','802.11ac (Wi-Fi 5)','802.11ax (Wi-Fi 6)','802.11g'],                                                                      correctAnswer:1, explanation:'802.11ac (Wi-Fi 5) operates only at 5 GHz and supports up to 6.9 Gbps via MU-MIMO.' },
+  { id:12, category:'automation',           difficulty:'medium', question:'Which HTTP method retrieves data without modifying it?',                        options:['POST','PUT','GET','DELETE'],                                                                                                                     correctAnswer:2, explanation:'GET is read-only and idempotent — repeating the request yields the same result.' },
 ];
 
-/* ─── HELPERS ─── */
-function parseContent(text) {
-  const lines = text.split('\n');
-  const blocks = [];
-  let currentList = null;
+const topoDevices = [
+  { id:1, type:'router', label:'R1',   x:12, y:45, config:'hostname R1\n!\ninterface Gi0/0\n ip address 10.1.1.1 255.255.255.0\n no shutdown\n!\nrouter ospf 1\n network 10.1.1.0 0.0.0.255 area 0' },
+  { id:2, type:'switch', label:'SW1',  x:42, y:45, config:'hostname SW1\n!\nvlan 10\n name SALES\nvlan 20\n name ENGINEERING\n!\ninterface Gi0/1\n switchport mode trunk' },
+  { id:3, type:'pc',     label:'PC1',  x:28, y:78, config:'hostname PC1\nIP:      10.1.10.10\nMask:    255.255.255.0\nGW:      10.1.1.1\nVLAN:    10 (SALES)' },
+  { id:4, type:'pc',     label:'PC2',  x:56, y:78, config:'hostname PC2\nIP:      10.1.20.10\nMask:    255.255.255.0\nGW:      10.1.1.1\nVLAN:    20 (ENGINEERING)' },
+  { id:5, type:'server', label:'SRV1', x:72, y:45, config:'hostname SRV1\n!\ninterface Gi0/0\n ip address 10.1.1.100 255.255.255.0\n no shutdown\n!\nip dhcp pool SALES\n network 10.1.10.0 255.255.255.0\n default-router 10.1.1.1' },
+];
+const topoLinks = [
+  { from:1, to:2, label:'Gi0/0' },
+  { from:2, to:3, label:'Fa0/2' },
+  { from:2, to:4, label:'Fa0/3' },
+  { from:2, to:5, label:'Gi0/4' },
+];
 
-  lines.forEach((line) => {
-    const trimmed = line.trim();
-    if (!trimmed) { if (currentList) { blocks.push(currentList); currentList = null; } return; }
+/* ══════════════════════════ STYLES ════════════════════════════ */
+const STYLE = `
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap');
 
-    // numbered step
-    const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
-    if (numMatch) {
-      if (!currentList || currentList.type !== 'ol') { if (currentList) blocks.push(currentList); currentList = { type: 'ol', items: [] }; }
-      currentList.items.push(numMatch[2]);
-      return;
-    }
-    // bullet
-    if (trimmed.startsWith('- ')) {
-      if (!currentList || currentList.type !== 'ul') { if (currentList) blocks.push(currentList); currentList = { type: 'ul', items: [] }; }
-      currentList.items.push(trimmed.slice(2));
-      return;
-    }
-    // heading (bold ending with colon)
-    if (trimmed.startsWith('**') && (trimmed.endsWith(':**') || trimmed.endsWith('**'))) {
-      if (currentList) { blocks.push(currentList); currentList = null; }
-      blocks.push({ type: 'h', text: trimmed.replace(/\*\*/g, '') });
-      return;
-    }
-    // inline bold items like  **Layer 7 - Application**: …
-    const inlineBold = trimmed.match(/^\*\*(.+?)\*\*[:\s]*(.*)/);
-    if (inlineBold) {
-      if (currentList) { blocks.push(currentList); currentList = null; }
-      blocks.push({ type: 'p', parts: [{ bold: true, text: inlineBold[1] }, { bold: false, text: (inlineBold[2] || '').replace(/^:\s*/, ': ') }] });
-      return;
-    }
-    // plain paragraph
-    if (currentList) { blocks.push(currentList); currentList = null; }
-    blocks.push({ type: 'p', parts: [{ bold: false, text: trimmed }] });
-  });
-  if (currentList) blocks.push(currentList);
-  return blocks;
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+:root {
+  --navy:      #00204d;
+  --navy-dark: #011839;
+  --navy-mid:  #0a2744;
+  --navy-lite: #162d4a;
+  --gold:      #f2c434;
+  --gold-dark: #c9a01a;
+  --white:     #ffffff;
+  --off-white: #eef1f4;
+  --muted:     #7a95b0;
+  --border:    #1a3555;
+  --green:     #1ea86a;
+  --green-bg:  rgba(30,168,106,.12);
+  --red:       #d93025;
+  --red-bg:    rgba(217,48,37,.12);
+  --amber:     #e8a012;
+  --amber-bg:  rgba(232,160,18,.12);
 }
 
-/* ─── NETWORK SIMULATION ─── */
-const NetworkSimulation = () => {
-  const [devices] = useState([
-    { id: 1, type: 'router', x: 160, y: 100, name: 'R1', config: 'hostname R1\n!\ninterface GigabitEthernet0/0\n ip address 10.1.1.1 255.255.255.0\n no shutdown\n!\ninterface GigabitEthernet0/1\n ip address 10.1.2.1 255.255.255.0\n no shutdown' },
-    { id: 2, type: 'switch', x: 380, y: 100, name: 'SW1', config: 'hostname SW1\n!\ninterface FastEthernet0/1\n switchport mode trunk\n no shutdown\n!\ninterface FastEthernet0/2\n switchport access vlan 10\n no shutdown\n!\nvlan 10\n name Engineering\nvlan 20\n name Marketing' },
-    { id: 3, type: 'switch', x: 540, y: 260, name: 'SW2', config: 'hostname SW2\n!\ninterface FastEthernet0/1\n switchport mode trunk\n no shutdown\n!\ninterface FastEthernet0/2\n switchport access vlan 20\n no shutdown' },
-    { id: 4, type: 'pc', x: 280, y: 280, name: 'PC1', config: 'Hostname : PC1\nIP Address : 10.1.10.10\nSubnet Mask : 255.255.255.0\nDefault Gateway : 10.1.10.1\nVLAN : 10 (Engineering)' },
-    { id: 5, type: 'pc', x: 440, y: 380, name: 'PC2', config: 'Hostname : PC2\nIP Address : 10.1.20.10\nSubnet Mask : 255.255.255.0\nDefault Gateway : 10.1.20.1\nVLAN : 20 (Marketing)' },
-    { id: 6, type: 'server', x: 640, y: 380, name: 'SRV1', config: 'Hostname : SRV1\nIP Address : 10.1.30.1\nSubnet Mask : 255.255.255.0\nServices : DHCP, DNS, HTTP\nVLAN : 30 (Servers)' },
-  ]);
+html, body {
+  min-height:100%;
+  background:var(--navy-dark);
+  color:var(--off-white);
+  font-family:'Source Sans 3', sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::-webkit-scrollbar       { width:8px; }
+::-webkit-scrollbar-track { background:var(--navy-dark); }
+::-webkit-scrollbar-thumb { background:var(--navy-lite); }
 
-  const connections = [
-    { from: 1, to: 2, label: 'Gi0/0 — Fa0/1', speed: '1 Gbps' },
-    { from: 2, to: 3, label: 'Fa0/3 — Fa0/1', speed: '100 Mbps' },
-    { from: 2, to: 4, label: 'Fa0/2', speed: '100 Mbps' },
-    { from: 3, to: 5, label: 'Fa0/2', speed: '100 Mbps' },
-    { from: 3, to: 6, label: 'Fa0/3', speed: '100 Mbps' },
-  ];
+/* ═══ TOP NAV BAR ═══ */
+.topbar {
+  background:var(--navy-dark);
+  border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:100;
+}
+.topbar-inner {
+  max-width:1200px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 28px; height:68px;
+}
+.topbar-logo {
+  display:flex; align-items:center; gap:14px;
+}
+.topbar-logo-text {
+  font-family:'Oswald',sans-serif;
+  font-size:20px; font-weight:600;
+  color:var(--white);
+  text-transform:uppercase;
+  letter-spacing:2.5px;
+  line-height:1;
+}
+.topbar-logo-text span {
+  display:block;
+  font-size:10px; font-weight:400;
+  letter-spacing:3px;
+  color:var(--muted);
+  margin-top:3px;
+}
+.topbar-nav { display:flex; gap:2px; }
+.topbar-nav button {
+  background:none; border:none;
+  font-family:'Oswald',sans-serif;
+  font-size:14px; font-weight:500;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:1.8px;
+  padding:8px 16px;
+  cursor:pointer;
+  border-radius:4px;
+  transition:color .15s, background .15s;
+  position:relative;
+}
+.topbar-nav button:hover { color:var(--white); background:rgba(255,255,255,.06); }
+.topbar-nav button.active { color:var(--white); background:rgba(255,255,255,.1); }
+.topbar-nav button.active::after {
+  content:''; position:absolute; bottom:0; left:16px; right:16px;
+  height:3px; background:var(--gold); border-radius:2px 2px 0 0;
+}
 
-  const [selected, setSelected] = useState(null);
-  const sel = devices.find(d => d.id === selected);
+/* ═══ GOLD STRIPE ═══ */
+.gold-stripe { height:4px; background:var(--gold); }
 
-  const iconPaths = {
-    router: (
-      <g>
-        <circle cx="0" cy="0" r="22" fill="#1e293b" stroke="#06b6d4" strokeWidth="2"/>
-        <circle cx="0" cy="0" r="14" fill="none" stroke="#06b6d4" strokeWidth="2.5"/>
-        <line x1="-8" y1="0" x2="8" y2="0" stroke="#06b6d4" strokeWidth="2.5"/>
-        <line x1="0" y1="-8" x2="0" y2="8" stroke="#06b6d4" strokeWidth="2.5"/>
-        <polygon points="8,-3 12,0 8,3" fill="#06b6d4"/>
-        <polygon points="-8,3 -12,0 -8,-3" fill="#06b6d4"/>
-        <polygon points="-3,-8 0,-12 3,-8" fill="#06b6d4"/>
-        <polygon points="3,8 0,12 -3,8" fill="#06b6d4"/>
-      </g>
-    ),
-    switch: (
-      <g>
-        <rect x="-22" y="-14" width="44" height="28" rx="5" fill="#1e293b" stroke="#10b981" strokeWidth="2"/>
-        {[-12,-4,4,12].map((x,i) => <rect key={i} x={x-2} y="-8" width="4" height="10" rx="1" fill="#10b981"/>)}
-        <line x1="-14" y1="8" x2="14" y2="8" stroke="#10b981" strokeWidth="1.5" strokeDasharray="3,3"/>
-      </g>
-    ),
-    pc: (
-      <g>
-        <rect x="-16" y="-14" width="32" height="20" rx="3" fill="#1e293b" stroke="#a78bfa" strokeWidth="2"/>
-        <rect x="-4" y="6" width="8" height="4" fill="#a78bfa"/>
-        <rect x="-8" y="10" width="16" height="2" rx="1" fill="#a78bfa"/>
-        <rect x="-10" y="-10" width="20" height="12" rx="1" fill="#334155"/>
-      </g>
-    ),
-    server: (
-      <g>
-        <rect x="-14" y="-18" width="28" height="36" rx="4" fill="#1e293b" stroke="#f59e0b" strokeWidth="2"/>
-        {[-10, -2, 6].map((y,i) => <rect key={i} x="-10" y={y} width="20" height="5" rx="2" fill="#334155" stroke="#f59e0b" strokeWidth="0.8"/>)}
-        {[-10, -2, 6].map((y,i) => <circle key={i} cx="8" cy={y+2.5} r="1.5" fill="#10b981"/>)}
-      </g>
-    )
-  };
+/* ═══ HERO ═══ */
+.hero {
+  background:linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 50%, #003366 100%);
+  padding:48px 28px 44px;
+  position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 90% 50%, rgba(0,51,102,.55) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 80% at 5% 80%, rgba(0,32,77,.5) 0%, transparent 60%);
+  pointer-events:none;
+}
+.hero-inner {
+  max-width:1200px; margin:0 auto;
+  position:relative; z-index:1;
+  display:flex; align-items:center; gap:40px;
+}
+.hero-content { flex:1; }
+.hero-content h1 {
+  font-family:'Oswald',sans-serif;
+  font-size:52px; font-weight:700;
+  color:var(--white);
+  text-transform:uppercase;
+  letter-spacing:2px;
+  line-height:1.05;
+  margin-bottom:14px;
+}
+.hero-content h1 em { font-style:normal; color:var(--gold); }
+.hero-content p {
+  font-size:18px; font-weight:300;
+  color:var(--muted); line-height:1.5;
+  max-width:540px;
+}
+.hero-badges { display:flex; gap:10px; flex-wrap:wrap; margin-top:22px; }
+.hero-badge {
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
+  color:var(--off-white);
+  font-family:'Oswald',sans-serif;
+  font-size:13px; font-weight:500;
+  text-transform:uppercase; letter-spacing:1.5px;
+  padding:6px 16px; border-radius:3px;
+}
+.hero-emblem { flex-shrink:0; }
 
-  return (
-    <div style={{ maxWidth: 780, margin: '0 auto' }}>
-      <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ padding: '24px 28px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#f1f5f9', margin: 0 }}>Network Topology</h3>
-              <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>Click any device to inspect its configuration</p>
-            </div>
-            <div style={{ display: 'flex', gap: 12 }}>
-              {[
-                { type: 'router', color: '#06b6d4', label: 'Router' },
-                { type: 'switch', color: '#10b981', label: 'Switch' },
-                { type: 'pc', color: '#a78bfa', label: 'PC' },
-                { type: 'server', color: '#f59e0b', label: 'Server' },
-              ].map(item => (
-                <div key={item.type} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: 2, background: item.color }}/>
-                  <span style={{ fontSize: 11, color: '#94a3b8' }}>{item.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+/* ═══ SHELL ═══ */
+.shell { max-width:1200px; margin:0 auto; padding:32px 28px 80px; }
 
-        <svg viewBox="0 0 780 440" style={{ width: '100%', background: '#0f172a' }}>
-          <defs>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="2" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-            <radialGradient id="bg1" cx="30%" cy="30%">
-              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.04"/>
-              <stop offset="100%" stopColor="transparent"/>
-            </radialGradient>
-          </defs>
-          <rect width="780" height="440" fill="url(#bg1)"/>
+/* ═══ SECTION HEADER ═══ */
+.section-hdr { margin-bottom:24px; border-bottom:2px solid var(--border); }
+.section-hdr h2 {
+  font-family:'Oswald',sans-serif;
+  font-size:22px; font-weight:600;
+  color:var(--white);
+  text-transform:uppercase;
+  letter-spacing:2px;
+  padding-bottom:12px;
+  border-bottom:3px solid var(--gold);
+  display:inline-block;
+  margin-bottom:-2px;
+}
 
-          {/* grid dots */}
-          {Array.from({ length: 20 }, (_, i) => Array.from({ length: 12 }, (_, j) => (
-            <circle key={`${i}-${j}`} cx={i * 40 + 20} cy={j * 40 + 20} r="1" fill="#1e293b"/>
-          )))}
+/* ═══ CARDS ═══ */
+.card { background:var(--navy-mid); border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+.card-head {
+  background:var(--navy); border-bottom:1px solid var(--border);
+  padding:14px 22px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.card-head h3 {
+  font-family:'Oswald',sans-serif;
+  font-size:16px; font-weight:600;
+  color:var(--white);
+  text-transform:uppercase; letter-spacing:1.8px;
+}
+.card-body { padding:22px; }
 
-          {/* connections */}
-          {connections.map((c, i) => {
-            const from = devices.find(d => d.id === c.from);
-            const to = devices.find(d => d.id === c.to);
-            if (!from || !to) return null;
-            const mx = (from.x + to.x) / 2, my = (from.y + to.y) / 2;
-            return (
-              <g key={i}>
-                <line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke="#06b6d4" strokeWidth="1.5" strokeOpacity="0.35" filter="url(#glow)"/>
-                <line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke="#06b6d4" strokeWidth="1" strokeOpacity="0.7" strokeDasharray="4 6"/>
-                <rect x={mx - 34} y={my - 10} width="68" height="18" rx="9" fill="#0f172a" fillOpacity="0.85" stroke="#1e293b" strokeWidth="1"/>
-                <text x={mx} y={my + 3} textAnchor="middle" fill="#64748b" fontSize="9" fontFamily="'JetBrains Mono', monospace">{c.label}</text>
-              </g>
-            );
-          })}
+/* ═══ STUDY GRID ═══ */
+.study-grid { display:grid; grid-template-columns:240px 1fr; gap:20px; }
+@media(max-width:700px){ .study-grid { grid-template-columns:1fr; } }
 
-          {/* devices */}
-          {devices.map(d => (
-            <g key={d.id} style={{ cursor: 'pointer' }} onClick={() => setSelected(selected === d.id ? null : d.id)}>
-              {selected === d.id && <circle cx={d.x} cy={d.y} r="30" fill="none" stroke="#06b6d4" strokeWidth="2" strokeOpacity="0.5" strokeDasharray="4 3"/>}
-              <g transform={`translate(${d.x},${d.y})`} filter="url(#glow)">{iconPaths[d.type]}</g>
-              <rect x={d.x - 18} y={d.y + 26} width="36" height="16" rx="8" fill="#1e293b" fillOpacity="0.9"/>
-              <text x={d.x} y={d.y + 37} textAnchor="middle" fill="#cbd5e1" fontSize="10" fontWeight="600" fontFamily="'Syne', sans-serif">{d.name}</text>
-            </g>
-          ))}
-        </svg>
+.domain-list { display:flex; flex-direction:column; }
+.domain-btn {
+  display:flex; align-items:center; gap:12px;
+  padding:13px 18px;
+  background:transparent; border:none;
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
+  font-family:'Source Sans 3',sans-serif;
+  font-size:15px; font-weight:600;
+  cursor:pointer; text-align:left; width:100%;
+  transition:background .15s, color .15s;
+}
+.domain-btn:first-child { border-top:1px solid var(--border); }
+.domain-btn:hover { background:rgba(255,255,255,.04); color:var(--white); }
+.domain-btn.active {
+  background:var(--navy-dark); color:var(--gold);
+  border-left:3px solid var(--gold); padding-left:15px;
+}
+.domain-btn .d-num {
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px; color:var(--muted); width:22px; flex-shrink:0;
+}
+.domain-btn.active .d-num { color:var(--gold); }
 
-        {/* config panel */}
-        {sel && (
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '20px 28px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 28, height: 28, borderRadius: 6, background: sel.type === 'router' ? '#06b6d4' : sel.type === 'switch' ? '#10b981' : sel.type === 'pc' ? '#a78bfa' : '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 14 }}>{sel.type === 'router' ? '⬡' : sel.type === 'switch' ? '⬜' : sel.type === 'pc' ? '💻' : '🖥️'}</span>
-                </div>
-                <span style={{ fontSize: 15, fontWeight: 700, color: '#f1f5f9' }}>{sel.name} <span style={{ fontWeight: 400, color: '#64748b', textTransform: 'capitalize' }}>— {sel.type}</span></span>
-              </div>
-              <button onClick={() => setSelected(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: 18, lineHeight: 1 }}>✕</button>
-            </div>
-            <pre style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: 10, padding: '14px 18px', fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: '#34d399', margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>{sel.config}</pre>
-          </div>
-        )}
-      </div>
-    </div>
+/* ═══ ACCORDION ═══ */
+.accord { border-bottom:1px solid var(--border); }
+.accord:last-child { border-bottom:none; }
+.accord-head {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:15px 0; background:none; border:none; width:100%;
+  cursor:pointer; color:var(--off-white);
+  font-family:'Source Sans 3',sans-serif; font-size:16px; font-weight:600;
+  text-align:left; transition:color .15s;
+}
+.accord-head:hover { color:var(--gold); }
+.accord-head .chevr { font-size:10px; color:var(--muted); transition:transform .2s; flex-shrink:0; }
+.accord-head.open { color:var(--gold); }
+.accord-head.open .chevr { transform:rotate(90deg); }
+.accord-body { padding:0 0 20px; animation:fadeDown .2s ease; }
+@keyframes fadeDown { from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:translateY(0); } }
+
+/* ═══ CONTENT ═══ */
+.c-heading {
+  font-family:'Oswald',sans-serif; font-size:14px; font-weight:600;
+  color:var(--gold); text-transform:uppercase; letter-spacing:1.5px;
+  margin:18px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border);
+}
+.c-heading:first-child { margin-top:0; }
+.c-list { list-style:none; padding:0; }
+.c-list li { padding:5px 0 5px 20px; position:relative; font-size:15px; color:var(--off-white); line-height:1.55; }
+.c-list li::before { content:'▸'; position:absolute; left:0; color:var(--gold); font-size:13px; }
+.c-table { width:100%; border-collapse:collapse; margin:4px 0; }
+.c-table tr { border-bottom:1px solid rgba(26,53,85,.6); }
+.c-table tr:last-child { border-bottom:none; }
+.c-table tr:nth-child(even) { background:rgba(0,0,0,.12); }
+.c-table td { padding:7px 12px; font-size:14px; vertical-align:top; }
+.c-table td:first-child { font-family:'Share Tech Mono',monospace; color:var(--gold); font-weight:600; white-space:nowrap; width:1%; }
+.c-table td:nth-child(2) { color:var(--white); font-weight:600; }
+.c-table td:nth-child(3) { color:var(--muted); }
+
+/* ═══ MODE CARDS ═══ */
+.mode-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+@media(max-width:540px){ .mode-grid { grid-template-columns:1fr; } }
+.mode-card {
+  background:var(--navy-mid); border:2px solid var(--border);
+  border-radius:6px; padding:32px 24px; text-align:center;
+  cursor:pointer; transition:border-color .2s, transform .15s;
+}
+.mode-card:hover { border-color:var(--gold); transform:translateY(-2px); }
+.mode-card .mc-icon {
+  width:52px; height:52px; margin:0 auto 16px;
+  background:var(--navy-dark); border:2px solid var(--border); border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+}
+.mode-card .mc-icon svg { width:24px; height:24px; }
+.mode-card h3 {
+  font-family:'Oswald',sans-serif; font-size:19px; font-weight:600;
+  color:var(--white); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;
+}
+.mode-card p { font-size:14px; color:var(--muted); }
+
+/* ═══ QUESTION ═══ */
+.q-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.q-counter { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--muted); }
+.q-badge {
+  font-family:'Oswald',sans-serif; font-size:11px; font-weight:600;
+  letter-spacing:1.2px; text-transform:uppercase; padding:3px 12px; border-radius:3px;
+}
+.q-badge.easy   { background:var(--green-bg); color:var(--green); border:1px solid rgba(30,168,106,.3); }
+.q-badge.medium { background:var(--amber-bg); color:var(--amber); border:1px solid rgba(232,160,18,.3); }
+.q-badge.hard   { background:var(--red-bg);   color:var(--red);   border:1px solid rgba(217,48,37,.3); }
+
+.progress-track { height:4px; background:var(--navy-dark); margin-bottom:22px; overflow:hidden; }
+.progress-fill  { height:100%; background:var(--gold); transition:width .35s; }
+
+.q-text {
+  font-size:17px; font-weight:600; color:var(--white); line-height:1.5;
+  padding:20px 22px; border-radius:4px;
+  background:var(--navy-dark); border-left:4px solid var(--gold); margin-bottom:20px;
+}
+
+.options { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
+.opt {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 18px; border-radius:4px;
+  border:2px solid var(--border); background:var(--navy-dark);
+  color:var(--off-white); font-size:15px;
+  cursor:pointer; transition:all .15s; text-align:left;
+  font-family:'Source Sans 3',sans-serif;
+}
+.opt:hover:not([disabled]) { border-color:var(--muted); background:rgba(255,255,255,.04); }
+.opt.sel     { border-color:var(--gold);  background:rgba(242,196,52,.08); color:var(--white); }
+.opt.correct { border-color:var(--green); background:var(--green-bg);      color:var(--white); }
+.opt.wrong   { border-color:var(--red);   background:var(--red-bg);        color:var(--white); }
+.opt[disabled] { cursor:default; }
+.opt-radio {
+  width:22px; height:22px; border-radius:50%;
+  border:2px solid var(--border); background:var(--navy-mid);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s;
+}
+.opt.sel     .opt-radio { border-color:var(--gold);  background:var(--gold); }
+.opt.correct .opt-radio { border-color:var(--green); background:var(--green); }
+.opt.wrong   .opt-radio { border-color:var(--red);   background:var(--red); }
+.opt-radio svg { width:12px; height:12px; }
+
+/* ═══ FEEDBACK ═══ */
+.feedback { padding:18px 20px; border-radius:4px; margin-bottom:18px; animation:fadeDown .2s ease; border-left:4px solid transparent; }
+.feedback.correct { background:var(--green-bg); border-left-color:var(--green); }
+.feedback.wrong   { background:var(--red-bg);   border-left-color:var(--red); }
+.feedback-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.feedback-head strong { font-size:15px; font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:1px; }
+.feedback.correct .feedback-head strong { color:var(--green); }
+.feedback.wrong   .feedback-head strong { color:var(--red); }
+.feedback p { font-size:14px; color:var(--off-white); line-height:1.55; }
+
+/* ═══ BUTTONS ═══ */
+.btn {
+  padding:11px 26px; border-radius:4px; border:none;
+  font-family:'Oswald',sans-serif; font-size:15px; font-weight:600;
+  text-transform:uppercase; letter-spacing:1.8px;
+  cursor:pointer; transition:all .15s;
+}
+.btn:hover  { filter:brightness(1.1); transform:translateY(-1px); }
+.btn:active { transform:translateY(0); }
+.btn-gold   { background:var(--gold); color:var(--navy-dark); box-shadow:0 3px 10px rgba(242,196,52,.3); }
+.btn-gold:hover { background:#f5d05a; }
+.btn-outline { background:transparent; color:var(--white); border:2px solid var(--muted); }
+.btn-outline:hover { border-color:var(--white); }
+.btn-green  { background:var(--green); color:#fff; }
+.btn-ghost  { background:var(--navy-dark); color:var(--off-white); border:1px solid var(--border); font-size:13px; padding:9px 20px; }
+.btn-ghost:hover { border-color:var(--muted); }
+.btn-ghost[disabled] { opacity:.3; cursor:default; filter:none; transform:none; }
+.btn-full { width:100%; }
+.btn-row { display:flex; justify-content:space-between; gap:8px; margin-top:20px; }
+
+/* ═══ SELECT ═══ */
+.sel-wrap { margin-bottom:20px; position:relative; }
+.sel-wrap select {
+  width:100%; padding:11px 40px 11px 16px; border-radius:4px; appearance:none;
+  border:2px solid var(--border); background:var(--navy-dark);
+  color:var(--white); font-family:'Source Sans 3',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+}
+.sel-wrap select:focus { outline:none; border-color:var(--gold); }
+.sel-wrap select option { background:var(--navy-dark); color:#fff; }
+.sel-wrap::after { content:'▾'; position:absolute; right:16px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+
+/* ═══ NETWORK LAB ═══ */
+.lab-canvas {
+  position:relative; width:100%; aspect-ratio:16/7;
+  background:var(--navy-dark); border:1px solid var(--border); border-radius:4px;
+  overflow:hidden; margin-bottom:16px;
+}
+.lab-canvas svg.topo-svg { position:absolute; inset:0; width:100%; height:100%; }
+.device {
+  position:absolute; display:flex; flex-direction:column; align-items:center;
+  transform:translate(-50%,-50%); cursor:pointer; transition:transform .18s; user-select:none;
+}
+.device:hover { transform:translate(-50%,-50%) scale(1.12); }
+.device .dv-wrap {
+  width:50px; height:50px; border-radius:6px;
+  background:var(--navy-mid); border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center; transition:all .18s;
+}
+.device.sel .dv-wrap { border-color:var(--gold); box-shadow:0 0 0 3px rgba(242,196,52,.25); }
+.device .dv-label {
+  margin-top:6px; font-family:'Oswald',sans-serif;
+  font-size:11px; font-weight:600; letter-spacing:1.5px;
+  text-transform:uppercase; color:var(--muted);
+}
+.device.sel .dv-label { color:var(--gold); }
+.topo-link-label { font-size:9px; font-weight:600; fill:var(--gold); font-family:'Share Tech Mono',monospace; }
+
+/* ═══ CONFIG PANEL ═══ */
+.cfg-panel { margin-bottom:16px; border:1px solid var(--border); border-radius:4px; overflow:hidden; animation:fadeDown .18s ease; }
+.cfg-panel-head {
+  background:var(--navy-dark); border-bottom:1px solid var(--border);
+  padding:10px 16px; display:flex; justify-content:space-between; align-items:center;
+}
+.cfg-panel-head span { font-family:'Oswald',sans-serif; font-size:13px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; }
+.cfg-panel-head button { background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; line-height:1; }
+.cfg-panel-head button:hover { color:var(--white); }
+.cfg-code { background:var(--navy-dark); padding:16px 18px; font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--green); line-height:1.8; white-space:pre; overflow-x:auto; }
+.palette { display:flex; gap:6px; }
+.palette-item {
+  flex:1; padding:10px 4px; border-radius:4px;
+  border:1px solid var(--border); background:var(--navy-dark);
+  cursor:pointer; text-align:center;
+  font-family:'Oswald',sans-serif; font-size:11px; font-weight:500;
+  color:var(--muted); letter-spacing:1px; text-transform:uppercase; transition:all .15s;
+}
+.palette-item:hover { border-color:var(--gold); color:var(--gold); }
+
+/* ═══ STATS ═══ */
+.stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
+@media(max-width:500px){ .stats-grid { grid-template-columns:1fr; } }
+.stat-card { background:var(--navy-dark); border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+.stat-card-top { height:4px; }
+.stat-card-top.blue  { background:var(--gold); }
+.stat-card-top.green { background:var(--green); }
+.stat-card-top.amber { background:var(--amber); }
+.stat-card-inner { padding:18px 20px; }
+.stat-card-label { font-family:'Oswald',sans-serif; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:1.8px; color:var(--muted); margin-bottom:8px; }
+.stat-card .s-val { font-family:'Oswald',sans-serif; font-size:38px; font-weight:700; line-height:1; }
+.stat-card.blue  .s-val { color:var(--gold); }
+.stat-card.green .s-val { color:var(--green); }
+.stat-card.amber .s-val { color:var(--amber); }
+.stat-card .s-sub { font-size:13px; color:var(--muted); margin-top:4px; }
+.history-row { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border); background:var(--navy-dark); }
+.history-row:last-child { border-bottom:none; }
+.history-row .hr-title { font-size:15px; font-weight:600; color:var(--white); }
+.history-row .hr-date  { font-size:12px; color:var(--muted); margin-top:2px; font-family:'Share Tech Mono',monospace; }
+.history-row .hr-score { font-family:'Oswald',sans-serif; font-size:24px; font-weight:700; }
+.history-row .hr-sub   { font-size:12px; color:var(--muted); text-align:right; margin-top:2px; font-family:'Share Tech Mono',monospace; }
+.hr-score.pass { color:var(--green); }
+.hr-score.mid  { color:var(--amber); }
+.hr-score.fail { color:var(--red); }
+
+/* ═══ CENTERED STATES ═══ */
+.centered { text-align:center; padding:56px 24px 40px; }
+.centered .c-icon { margin-bottom:18px; }
+.centered .c-icon svg { width:56px; height:56px; }
+.centered h2 { font-family:'Oswald',sans-serif; font-size:24px; font-weight:600; color:var(--white); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; }
+.centered p { font-size:15px; color:var(--muted); margin-bottom:24px; max-width:460px; margin-left:auto; margin-right:auto; }
+.centered .btn-group { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.exam-result .big { font-family:'Oswald',sans-serif; font-size:64px; font-weight:700; color:var(--gold); margin:8px 0; }
+.exam-result .pct { font-size:17px; color:var(--muted); margin-bottom:28px; }
+.exam-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.exam-nav .en-left { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--muted); }
+
+/* ═══ FOOTER STRIPE ═══ */
+.footer-stripe { height:6px; background:linear-gradient(90deg, var(--navy-dark) 0%, var(--gold) 30%, var(--gold) 70%, var(--navy-dark) 100%); position:fixed; bottom:0; left:0; right:0; z-index:50; }
+`;
+
+/* ══════════════════════════ DEVICE ICONS ══════════════════════ */
+const DevIcon = ({ type }) => {
+  if (type === 'router') return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect x="3" y="9" width="22" height="10" rx="2" stroke="#f2c434" strokeWidth="1.8" fill="none"/>
+      <circle cx="8" cy="14" r="2" fill="#f2c434"/><circle cx="14" cy="14" r="2" fill="#f2c434"/><circle cx="20" cy="14" r="2" fill="#1ea86a"/>
+      <line x1="7" y1="9" x2="7" y2="5" stroke="#f2c434" strokeWidth="1.6" strokeLinecap="round"/>
+      <line x1="21" y1="9" x2="21" y2="5" stroke="#f2c434" strokeWidth="1.6" strokeLinecap="round"/>
+      <line x1="7" y1="19" x2="7" y2="23" stroke="#f2c434" strokeWidth="1.6" strokeLinecap="round"/>
+      <line x1="21" y1="19" x2="21" y2="23" stroke="#f2c434" strokeWidth="1.6" strokeLinecap="round"/>
+    </svg>
   );
-};
-
-/* ─── PROGRESS RING SVG ─── */
-const ProgressRing = ({ percent, size = 80, stroke = 7, color = '#06b6d4' }) => {
-  const r = (size - stroke) / 2;
-  const circ = 2 * Math.PI * r;
-  const offset = circ - (percent / 100) * circ;
+  if (type === 'switch') return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect x="3" y="10" width="22" height="8" rx="2" stroke="#f2c434" strokeWidth="1.8" fill="none"/>
+      {[6,9,12,15,18,21].map((x,i) => <rect key={i} x={x-1} y="12.5" width="2" height="5" rx=".8" fill={i<4?'#f2c434':'#7a95b0'}/>)}
+      <line x1="6" y1="10" x2="6" y2="6" stroke="#f2c434" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="22" y1="10" x2="22" y2="6" stroke="#f2c434" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="6" y1="18" x2="6" y2="22" stroke="#f2c434" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="22" y1="18" x2="22" y2="22" stroke="#f2c434" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+  if (type === 'pc') return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect x="4" y="3" width="20" height="14" rx="2" stroke="#f2c434" strokeWidth="1.8" fill="none"/>
+      <rect x="6" y="5" width="16" height="10" rx=".8" fill="#011839"/>
+      <rect x="11" y="17" width="6" height="3" fill="#7a95b0"/>
+      <rect x="8" y="20" width="12" height="2.8" rx="1.4" stroke="#f2c434" strokeWidth="1.3" fill="none"/>
+      <circle cx="14" cy="9" r="2" fill="#f2c434" opacity=".6"/>
+    </svg>
+  );
   return (
-    <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke}/>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke}
-        strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round"
-        style={{ transition: 'stroke-dashoffset 0.6s ease' }}/>
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <rect x="7" y="2" width="14" height="6" rx="1.5" stroke="#f2c434" strokeWidth="1.5" fill="none"/>
+      <rect x="7" y="11" width="14" height="6" rx="1.5" stroke="#f2c434" strokeWidth="1.5" fill="none"/>
+      <rect x="7" y="20" width="14" height="6" rx="1.5" stroke="#f2c434" strokeWidth="1.5" fill="none"/>
+      <circle cx="11" cy="5" r="1.5" fill="#1ea86a"/><circle cx="11" cy="14" r="1.5" fill="#1ea86a"/><circle cx="11" cy="23" r="1.5" fill="#e8a012"/>
     </svg>
   );
 };
 
-/* ─── MAIN APP ─── */
-const CCNATrainer = () => {
-  const [activeTab, setActiveTab] = useState('study');
-  const [selectedCategory, setSelectedCategory] = useState('network-fundamentals');
-  const [expandedTopic, setExpandedTopic] = useState(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [showExplanation, setShowExplanation] = useState({});
-  const [examMode, setExamMode] = useState(false);
-  const allQuestions = examQuestions;
-  const [activeExamQuestions, setActiveExamQuestions] = useState([]);
-  const [examStarted, setExamStarted] = useState(false);
-  const [examCompleted, setExamCompleted] = useState(false);
-  const [score, setScore] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  const [progress, setProgress] = useState(() => {
-    try { const s = localStorage.getItem('ccna-progress'); return s ? JSON.parse(s) : {}; } catch { return {}; }
+/* ══════════════════════════ CONTENT RENDERER ══════════════════ */
+function renderContent(blocks) {
+  return blocks.map((b, i) => {
+    if (b.type === 'heading') return <div key={i} className="c-heading">{b.text}</div>;
+    if (b.type === 'list')    return <ul key={i} className="c-list">{b.items.map((it,j)=><li key={j}>{it}</li>)}</ul>;
+    if (b.type === 'rows' || b.type === 'table') return (
+      <table key={i} className="c-table"><tbody>{b.rows.map((r,j)=><tr key={j}>{r.map((c,k)=><td key={k}>{c}</td>)}</tr>)}</tbody></table>
+    );
+    return null;
   });
+}
 
-  useEffect(() => { localStorage.setItem('ccna-progress', JSON.stringify(progress)); }, [progress]);
-  useEffect(() => { setMounted(true); }, []);
+/* ══════════════════════════ NETWORK LAB ═══════════════════════ */
+function NetworkLab() {
+  const [sel, setSel] = useState(null);
+  const W = 1000, H = 440;
+  const px = p => W * p / 100;
+  const py = p => H * p / 100;
+  return (
+    <>
+      <div className="lab-canvas">
+        <svg className="topo-svg" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#f2c434" stopOpacity=".5"/><stop offset="100%" stopColor="#7a95b0" stopOpacity=".4"/>
+            </linearGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          {topoLinks.map((lk, i) => {
+            const f=topoDevices.find(d=>d.id===lk.from), t=topoDevices.find(d=>d.id===lk.to);
+            const x1=px(f.x),y1=py(f.y),x2=px(t.x),y2=py(t.y),mx=(x1+x2)/2,my=(y1+y2)/2;
+            return (
+              <g key={i}>
+                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="url(#lg1)" strokeWidth="2" strokeDasharray="8 4" filter="url(#glow)"/>
+                <rect x={mx-22} y={my-10} width="44" height="20" rx="3" fill="#0a2744" stroke="#1a3555" strokeWidth="1"/>
+                <text x={mx} y={my+5} textAnchor="middle" className="topo-link-label">{lk.label}</text>
+              </g>
+            );
+          })}
+        </svg>
+        {topoDevices.map(d => (
+          <div key={d.id} className={`device${sel===d.id?' sel':''}`} style={{left:`${d.x}%`,top:`${d.y}%`}} onClick={()=>setSel(sel===d.id?null:d.id)}>
+            <div className="dv-wrap"><DevIcon type={d.type}/></div>
+            <div className="dv-label">{d.label}</div>
+          </div>
+        ))}
+      </div>
+      {sel !== null && (() => {
+        const dev = topoDevices.find(d=>d.id===sel);
+        return (
+          <div className="cfg-panel">
+            <div className="cfg-panel-head"><span>{dev.label} — Configuration</span><button onClick={()=>setSel(null)}>&times;</button></div>
+            <div className="cfg-code">{dev.config}</div>
+          </div>
+        );
+      })()}
+      <div className="palette">{['Router','Switch','PC','Server'].map(t=><div key={t} className="palette-item">{t}</div>)}</div>
+    </>
+  );
+}
 
-  const tabs = [
-    { id: 'study', label: 'Study', icon: BookOpen },
-    { id: 'practice', label: 'Practice', icon: FileText },
-    { id: 'simulate', label: 'Lab', icon: Network },
-    { id: 'progress', label: 'Progress', icon: BarChart3 }
+/* ══════════════════════════ MAIN APP ══════════════════════════ */
+export default function CCNATrainer() {
+  const [tab, setTab]         = useState('study');
+  const [cat, setCat]         = useState('network-fundamentals');
+  const [openTopic, setOpen]  = useState(null);
+  const [tpIdx, setTpIdx]     = useState(0);
+  const [tpAns, setTpAns]     = useState({});
+  const [tpShow, setTpShow]   = useState({});
+  const [examMode, setExamMode]       = useState(false);
+  const [examQs, setExamQs]           = useState([]);
+  const [examStarted, setExamStarted] = useState(false);
+  const [examDone, setExamDone]       = useState(false);
+  const [exIdx, setExIdx]             = useState(0);
+  const [exAns, setExAns]             = useState({});
+  const [exScore, setExScore]         = useState(0);
+  const [progress, setProgress] = useState(()=>{
+    try{ const s=localStorage.getItem('ccna-progress'); return s?JSON.parse(s):{}; } catch(e){ return {}; }
+  });
+  useEffect(()=>{ localStorage.setItem('ccna-progress', JSON.stringify(progress)); }, [progress]);
+
+  const filteredQs = examQuestions.filter(q => q.category === cat);
+  const startExam = () => {
+    setExamQs([...examQuestions].sort(()=>Math.random()-.5).slice(0,12));
+    setExamStarted(true); setExamDone(false); setExIdx(0); setExAns({});
+  };
+  const submitExam = () => {
+    let c=0; examQs.forEach((q,i)=>{ if(exAns[i]===q.correctAnswer) c++; });
+    setExScore(c); setExamDone(true);
+    const p={...progress}; if(!p.exams) p.exams=[];
+    p.exams.push({ date:new Date().toISOString(), score:c, total:examQs.length, percentage:Math.round(c/examQs.length*100) });
+    setProgress(p);
+  };
+
+  const ShieldSVG = ({ size=56, opacity=1 }) => (
+    <svg width={size} height={size} viewBox="0 0 56 56" fill="none" opacity={opacity}>
+      <path d="M28 4L6 14v16c0 12.5 9.5 23.5 22 26 12.5-2.5 22-13.5 22-26V14L28 4z" stroke="#f2c434" strokeWidth="2" fill="none"/>
+      <path d="M28 12L12 19v11c0 9 7 17.5 16 19.5 9-2 16-10.5 16-19.5V19L28 12z" stroke="#f2c434" strokeWidth="1" fill="rgba(242,196,52,.06)"/>
+      <text x="28" y="33" textAnchor="middle" fill="#f2c434" fontFamily="Oswald,sans-serif" fontSize="16" fontWeight="700">CC</text>
+      <text x="28" y="41" textAnchor="middle" fill="#7a95b0" fontFamily="Share Tech Mono,monospace" fontSize="6.5">CCNA</text>
+    </svg>
+  );
+
+  const navDefs = [
+    { id:'study',label:'Study' },{ id:'practice',label:'Quiz' },{ id:'lab',label:'Network Lab' },{ id:'progress',label:'Stats' }
   ];
 
-  const startExam = () => {
-    const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
-    setActiveExamQuestions(shuffled.slice(0, Math.min(12, shuffled.length)));
-    setExamStarted(true);
-    setCurrentQuestionIndex(0);
-    setSelectedAnswers({});
-    setShowExplanation({});
-    setExamCompleted(false);
-  };
-
-  const submitExam = () => {
-    let correct = 0;
-    activeExamQuestions.forEach((q, idx) => { if (selectedAnswers[idx] === q.correctAnswer) correct++; });
-    setScore(correct);
-    setExamCompleted(true);
-    const np = { ...progress };
-    if (!np.exams) np.exams = [];
-    np.exams.push({ date: new Date().toISOString(), score: correct, total: activeExamQuestions.length, percentage: Math.round((correct / activeExamQuestions.length) * 100) });
-    setProgress(np);
-  };
-
-  const filteredQuestions = allQuestions.filter(q => q.category === selectedCategory);
-
-  const diffColor = { easy: '#10b981', medium: '#f59e0b', hard: '#ef4444' };
-  const diffBg = { easy: 'rgba(16,185,129,0.12)', medium: 'rgba(245,158,11,0.12)', hard: 'rgba(239,68,68,0.12)' };
-
-  /* ── STYLES (injected once) ── */
-  const globalStyles = `
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Syne', sans-serif; background: #0a0e1a; color: #cbd5e1; min-height: 100vh; }
-
-    .app-root {
-      min-height: 100vh;
-      background: #0a0e1a;
-      background-image:
-        radial-gradient(ellipse 80% 40% at 20% 0%, rgba(6,182,212,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 60% 50% at 85% 100%, rgba(16,185,129,0.06) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 30% at 50% 50%, rgba(139,92,246,0.04) 0%, transparent 70%);
-      color: #cbd5e1;
-      font-family: 'Syne', sans-serif;
-    }
-
-    /* grain overlay */
-    .app-root::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-      pointer-events: none;
-    }
-
-    .glass-card {
-      position: relative; z-index: 1;
-      background: rgba(15, 23, 42, 0.65);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    .glass-card-hover { transition: border-color 0.25s, box-shadow 0.25s; }
-    .glass-card-hover:hover { border-color: rgba(6,182,212,0.25); box-shadow: 0 0 24px rgba(6,182,212,0.08); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #06b6d4, #0891b2);
-      color: #fff; border: none; border-radius: 10px;
-      padding: 10px 22px; font-family: 'Syne', sans-serif;
-      font-weight: 600; font-size: 14px; cursor: pointer;
-      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 2px 12px rgba(6,182,212,0.25);
-    }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 18px rgba(6,182,212,0.35); }
-    .btn-primary:active { transform: translateY(0); }
-
-    .btn-ghost {
-      background: rgba(30,41,59,0.7); color: #94a3b8; border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 10px; padding: 10px 22px; font-family: 'Syne', sans-serif;
-      font-weight: 600; font-size: 14px; cursor: pointer;
-      transition: background 0.2s, color 0.2s, border-color 0.2s;
-    }
-    .btn-ghost:hover { background: rgba(51,65,85,0.8); color: #f1f5f9; border-color: rgba(255,255,255,0.12); }
-
-    .btn-ghost:disabled { opacity: 0.35; cursor: not-allowed; }
-
-    /* staggered fade-in */
-    .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.45s ease, transform 0.45s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #334155; }
-  `;
-
-  /* ── REVEAL HOOK ── */
-  const RevealWrap = ({ children, delay = 0 }) => {
-    const ref = useRef();
-    const [vis, setVis] = useState(false);
-    useEffect(() => {
-      const t = setTimeout(() => {
-        const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVis(true); obs.disconnect(); } }, { threshold: 0.1 });
-        if (ref.current) obs.observe(ref.current);
-        return () => obs.disconnect();
-      }, delay);
-      return () => clearTimeout(t);
-    }, [delay]);
-    return <div ref={ref} className={`reveal${vis ? ' visible' : ''}`}>{children}</div>;
-  };
-
-  /* ── RENDER ── */
-  return (
-    <div className="app-root" style={{ position: 'relative', zIndex: 1 }}>
-      <style>{globalStyles}</style>
-
-      {/* ── TOP NAV ── */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 100, padding: '0 24px', background: 'rgba(10,14,26,0.75)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {/* logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg,#06b6d4,#0891b2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🎓</div>
-            <div>
-              <span style={{ fontSize: 17, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.5px' }}>CCNA</span>
-              <span style={{ fontSize: 17, fontWeight: 400, color: '#64748b', marginLeft: 6 }}>Trainer</span>
-            </div>
-          </div>
-          {/* tabs */}
-          <nav style={{ display: 'flex', gap: 4 }}>
-            {tabs.map(tab => {
-              const Icon = tab.icon;
-              const active = activeTab === tab.id;
-              return (
-                <button key={tab.id} onClick={() => { setActiveTab(tab.id); if (tab.id !== 'practice') { setExamMode(false); setExamStarted(false); } }}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 7, padding: '8px 16px', borderRadius: 8,
-                    background: active ? 'rgba(6,182,212,0.12)' : 'transparent',
-                    border: active ? '1px solid rgba(6,182,212,0.3)' : '1px solid transparent',
-                    color: active ? '#06b6d4' : '#64748b',
-                    fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 13,
-                    cursor: 'pointer', transition: 'all 0.2s'
-                  }}>
-                  <Icon size={15} />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </nav>
-          {/* badge */}
-          <div style={{ fontSize: 11, color: '#475569', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>200-301</div>
+  const renderOpt = (option, idx, { isExam, revealed, answerIdx, correctIdx, onPick }) => {
+    let cls = 'opt';
+    if (isExam) { if (answerIdx===idx) cls+=' sel'; }
+    else { if (revealed) { if (idx===correctIdx) cls+=' correct'; else if (idx===answerIdx) cls+=' wrong'; } else if (answerIdx===idx) cls+=' sel'; }
+    const showCheck = (revealed && idx===correctIdx) || (!revealed && answerIdx===idx);
+    const showX     = revealed && idx===answerIdx && idx!==correctIdx;
+    return (
+      <button key={idx} className={cls} disabled={!isExam && !!revealed} onClick={()=>onPick(idx)}>
+        <div className="opt-radio">
+          {showCheck && !showX && <svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+          {showX && <svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="#fff" strokeWidth="2.5" fill="none" strokeLinecap="round"/></svg>}
         </div>
-      </header>
+        {option}
+      </button>
+    );
+  };
 
-      {/* ── PAGE BODY ── */}
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 80px' }}>
+  /* ═══ RENDER ═══ */
+  return (
+    <div>
+      <style>{STYLE}</style>
 
-        {/* ════════════════ STUDY TAB ════════════════ */}
-        {activeTab === 'study' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: 24 }}>
-            {/* sidebar */}
-            <aside>
-              <div className="glass-card" style={{ padding: 16 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 12, paddingBottom: 10, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>Domains</div>
-                {Object.entries(studyGuides).map(([key, cat], i) => {
-                  const active = selectedCategory === key;
-                  return (
-                    <button key={key} onClick={() => { setSelectedCategory(key); setExpandedTopic(null); }}
-                      style={{
-                        width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 10,
-                        padding: '10px 12px', borderRadius: 8, border: 'none', cursor: 'pointer', marginBottom: 2,
-                        background: active ? 'rgba(6,182,212,0.1)' : 'transparent',
-                        borderLeft: active ? `3px solid ${cat.color}` : '3px solid transparent',
-                        color: active ? '#f1f5f9' : '#94a3b8',
-                        fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: active ? 600 : 500,
-                        transition: 'all 0.2s'
-                      }}>
-                      <span style={{ fontSize: 17 }}>{cat.icon}</span>
-                      <span>{cat.title}</span>
-                      {/* question count badge */}
-                      <span style={{ marginLeft: 'auto', fontSize: 10, background: 'rgba(255,255,255,0.06)', color: '#64748b', padding: '2px 7px', borderRadius: 10 }}>
-                        {allQuestions.filter(q => q.category === key).length}Q
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </aside>
+      {/* nav */}
+      <nav className="topbar">
+        <div className="topbar-inner">
+          <div className="topbar-logo">
+            <ShieldSVG size={38}/>
+            <div className="topbar-logo-text">CCNA Trainer<span>Certification Preparation</span></div>
+          </div>
+          <div className="topbar-nav">
+            {navDefs.map(n => <button key={n.id} className={tab===n.id?'active':''} onClick={()=>setTab(n.id)}>{n.label}</button>)}
+          </div>
+        </div>
+      </nav>
+      <div className="gold-stripe"/>
 
-            {/* content */}
-            <div>
-              <RevealWrap>
-                <div className="glass-card" style={{ padding: 28 }}>
-                  {/* header row */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: studyGuides[selectedCategory].color + '1a', border: `1px solid ${studyGuides[selectedCategory].color}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
-                      {studyGuides[selectedCategory].icon}
-                    </div>
-                    <div>
-                      <h2 style={{ fontSize: 22, fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.5px' }}>{studyGuides[selectedCategory].title}</h2>
-                      <p style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>{studyGuides[selectedCategory].topics.length} topic{studyGuides[selectedCategory].topics.length > 1 ? 's' : ''} available</p>
-                    </div>
-                  </div>
-
-                  {/* topic accordions */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {studyGuides[selectedCategory].topics.map((topic, i) => {
-                      const open = expandedTopic === topic.id;
-                      return (
-                        <div key={topic.id} style={{ borderRadius: 12, border: `1px solid ${open ? studyGuides[selectedCategory].color + '33' : 'rgba(255,255,255,0.06)'}`, overflow: 'hidden', transition: 'border-color 0.3s' }}>
-                          <button onClick={() => setExpandedTopic(open ? null : topic.id)}
-                            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: open ? studyGuides[selectedCategory].color + '08' : 'transparent', border: 'none', cursor: 'pointer', transition: 'background 0.2s' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                              <div style={{ width: 6, height: 6, borderRadius: '50%', background: studyGuides[selectedCategory].color, opacity: open ? 1 : 0.4 }}/>
-                              <span style={{ fontSize: 15, fontWeight: 600, color: open ? '#f1f5f9' : '#cbd5e1', fontFamily: 'Syne, sans-serif' }}>{topic.title}</span>
-                            </div>
-                            <ChevronDown size={18} color="#64748b" style={{ transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s' }}/>
-                          </button>
-
-                          {open && (
-                            <div style={{ padding: '0 20px 20px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                              <div style={{ paddingTop: 18 }}>
-                                {parseContent(topic.content).map((block, idx) => {
-                                  if (block.type === 'h') return <div key={idx} style={{ fontSize: 14, fontWeight: 700, color: studyGuides[selectedCategory].color, marginTop: idx > 0 ? 18 : 0, marginBottom: 8 }}>{block.text}</div>;
-                                  if (block.type === 'ul' || block.type === 'ol') return (
-                                    <div key={idx} style={{ marginBottom: 10 }}>
-                                      {block.items.map((item, j) => (
-                                        <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '5px 0' }}>
-                                          <span style={{ marginTop: 7, width: 6, height: 6, borderRadius: '50%', background: '#334155', flexShrink: 0 }}/>
-                                          <span style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{item}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  );
-                                  // paragraph with possible bold
-                                  return (
-                                    <p key={idx} style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.7, marginBottom: 6 }}>
-                                      {block.parts.map((p, j) => p.bold ? <strong key={j} style={{ color: '#cbd5e1' }}>{p.text}</strong> : <span key={j}>{p.text}</span>)}
-                                    </p>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </RevealWrap>
+      {/* hero */}
+      <div className="hero">
+        <div className="hero-inner">
+          <div className="hero-content">
+            <h1>Master the <em>Network.</em><br/>Ace the Exam.</h1>
+            <p>A comprehensive CCNA 200-301 preparation platform. Study six core domains, practice with real exam questions, and simulate live network topologies.</p>
+            <div className="hero-badges">
+              <span className="hero-badge">6 Domains</span>
+              <span className="hero-badge">12+ Questions</span>
+              <span className="hero-badge">Network Lab</span>
+              <span className="hero-badge">Progress Tracking</span>
             </div>
           </div>
-        )}
+          <div className="hero-emblem"><ShieldSVG size={140} opacity={0.22}/></div>
+        </div>
+      </div>
 
-        {/* ════════════════ PRACTICE TAB ════════════════ */}
-        {activeTab === 'practice' && (
-          <div style={{ maxWidth: 720, margin: '0 auto' }}>
-            {/* mode selector */}
-            {!examMode && !examStarted && (
-              <RevealWrap>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18, marginBottom: 28 }}>
-                  {[
-                    { type: 'topic', title: 'Topic Practice', desc: 'Study by category with instant feedback', icon: '📖', color: '#06b6d4', gradient: 'rgba(6,182,212,0.08)' },
-                    { type: 'exam', title: 'Timed Exam', desc: 'Simulate the real CCNA exam', icon: '⏱️', color: '#f59e0b', gradient: 'rgba(245,158,11,0.08)' }
-                  ].map(m => (
-                    <button key={m.type} onClick={() => { if (m.type === 'exam') { setExamMode(true); setExamStarted(false); setExamCompleted(false); } else { setExamMode(false); setCurrentQuestionIndex(0); } }}
-                      className="glass-card glass-card-hover"
-                      style={{ padding: 24, border: `1px solid ${m.color}22`, cursor: 'pointer', textAlign: 'left', transition: 'all 0.25s', background: m.gradient }}>
-                      <div style={{ fontSize: 32, marginBottom: 10 }}>{m.icon}</div>
-                      <h3 style={{ fontSize: 17, fontWeight: 700, color: '#f1f5f9', marginBottom: 6 }}>{m.title}</h3>
-                      <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.5 }}>{m.desc}</p>
+      {/* content */}
+      <div className="shell">
+
+        {/* STUDY */}
+        {tab === 'study' && (
+          <>
+            <div className="section-hdr"><h2>Study Guides</h2></div>
+            <div className="study-grid">
+              <div className="card">
+                <div className="card-head"><h3>Domains</h3></div>
+                <div className="domain-list">
+                  {Object.entries(studyGuides).map(([k,v],i) => (
+                    <button key={k} className={`domain-btn${cat===k?' active':''}`} onClick={()=>{setCat(k);setOpen(null);}}>
+                      <span className="d-num">{String(i+1).padStart(2,'0')}</span>{v.title}
                     </button>
                   ))}
                 </div>
-              </RevealWrap>
-            )}
-
-            {/* ── TOPIC PRACTICE ── */}
-            {!examMode && (
-              <RevealWrap delay={60}>
-                <div className="glass-card" style={{ padding: 28 }}>
-                  {/* category selector */}
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 22 }}>
-                    {Object.entries(studyGuides).map(([key, cat]) => {
-                      const active = selectedCategory === key;
-                      const hasQ = allQuestions.some(q => q.category === key);
-                      if (!hasQ) return null;
-                      return (
-                        <button key={key} onClick={() => { setSelectedCategory(key); setCurrentQuestionIndex(0); setSelectedAnswers({}); setShowExplanation({}); }}
-                          style={{
-                            padding: '6px 14px', borderRadius: 20, border: `1px solid ${active ? cat.color + '55' : 'rgba(255,255,255,0.07)'}`,
-                            background: active ? cat.color + '12' : 'transparent',
-                            color: active ? cat.color : '#94a3b8',
-                            fontFamily: 'Syne, sans-serif', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s'
-                          }}>
-                          {cat.icon} {cat.title}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {filteredQuestions.length > 0 && (
-                    <>
-                      {/* progress bar + meta */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                        <span style={{ fontSize: 13, color: '#64748b', fontWeight: 600 }}>Question {currentQuestionIndex + 1} <span style={{ color: '#475569' }}>/ {filteredQuestions.length}</span></span>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: diffColor[filteredQuestions[currentQuestionIndex].difficulty], background: diffBg[filteredQuestions[currentQuestionIndex].difficulty], padding: '3px 10px', borderRadius: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                          {filteredQuestions[currentQuestionIndex].difficulty}
-                        </span>
-                      </div>
-                      <div style={{ height: 3, background: '#1e293b', borderRadius: 2, marginBottom: 22, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${((currentQuestionIndex + 1) / filteredQuestions.length) * 100}%`, background: 'linear-gradient(90deg,#06b6d4,#10b981)', borderRadius: 2, transition: 'width 0.4s ease' }}/>
-                      </div>
-
-                      {/* question card */}
-                      <div style={{ background: 'rgba(15,23,42,0.6)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)', padding: '20px 22px', marginBottom: 18 }}>
-                        <p style={{ fontSize: 16, fontWeight: 600, color: '#f1f5f9', lineHeight: 1.55 }}>{filteredQuestions[currentQuestionIndex].question}</p>
-                      </div>
-
-                      {/* options */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
-                        {filteredQuestions[currentQuestionIndex].options.map((opt, idx) => {
-                          const isSelected = selectedAnswers[currentQuestionIndex] === idx;
-                          const isCorrect = idx === filteredQuestions[currentQuestionIndex].correctAnswer;
-                          const revealed = showExplanation[currentQuestionIndex];
-                          let bg = 'rgba(30,41,59,0.5)', border = 'rgba(255,255,255,0.07)', textCol = '#cbd5e1';
-                          if (revealed) {
-                            if (isCorrect) { bg = 'rgba(16,185,129,0.12)'; border = '#10b981'; textCol = '#fff'; }
-                            else if (isSelected) { bg = 'rgba(239,68,68,0.1)'; border = '#ef4444'; textCol = '#fff'; }
-                          } else if (isSelected) { bg = 'rgba(6,182,212,0.12)'; border = '#06b6d4'; textCol = '#fff'; }
-                          return (
-                            <button key={idx} disabled={!!revealed} onClick={() => { if (!revealed) setSelectedAnswers({ ...selectedAnswers, [currentQuestionIndex]: idx }); }}
-                              style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 18px', borderRadius: 10, background: bg, border: `1px solid ${border}`, cursor: revealed ? 'default' : 'pointer', transition: 'all 0.2s', textAlign: 'left' }}>
-                              {/* radio circle */}
-                              <div style={{ width: 22, height: 22, borderRadius: '50%', border: `2px solid ${revealed ? (isCorrect ? '#10b981' : isSelected ? '#ef4444' : '#334155') : (isSelected ? '#06b6d4' : '#334155')}`, background: revealed ? (isCorrect ? '#10b981' : isSelected ? '#ef4444' : 'transparent') : (isSelected ? '#06b6d4' : 'transparent'), display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s' }}>
-                                {((revealed && isCorrect) || (!revealed && isSelected)) && <Check size={13} color="#fff"/>}
-                                {revealed && isSelected && !isCorrect && <X size={13} color="#fff"/>}
-                              </div>
-                              <span style={{ fontSize: 14, color: textCol, fontWeight: isSelected || (revealed && isCorrect) ? 600 : 400 }}>{opt}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* check answer btn */}
-                      {!showExplanation[currentQuestionIndex] && selectedAnswers[currentQuestionIndex] !== undefined && (
-                        <button className="btn-primary" onClick={() => setShowExplanation({ ...showExplanation, [currentQuestionIndex]: true })} style={{ width: '100%', padding: '12px', fontSize: 15, marginBottom: 16 }}>
-                          Check Answer
-                        </button>
-                      )}
-
-                      {/* explanation */}
-                      {showExplanation[currentQuestionIndex] && (
-                        <div style={{ borderRadius: 12, padding: '18px 20px', marginBottom: 20, background: selectedAnswers[currentQuestionIndex] === filteredQuestions[currentQuestionIndex].correctAnswer ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.08)', border: `1px solid ${selectedAnswers[currentQuestionIndex] === filteredQuestions[currentQuestionIndex].correctAnswer ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}` }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            {selectedAnswers[currentQuestionIndex] === filteredQuestions[currentQuestionIndex].correctAnswer
-                              ? <><Check size={18} color="#10b981"/><span style={{ fontWeight: 700, color: '#10b981', fontSize: 15 }}>Correct!</span></>
-                              : <><X size={18} color="#ef4444"/><span style={{ fontWeight: 700, color: '#ef4444', fontSize: 15 }}>Incorrect</span></>
-                            }
-                          </div>
-                          <p style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.65 }}>{filteredQuestions[currentQuestionIndex].explanation}</p>
-                        </div>
-                      )}
-
-                      {/* prev / next */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <button className="btn-ghost" disabled={currentQuestionIndex === 0} onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <ArrowLeft size={15}/> Previous
-                        </button>
-                        <button className="btn-ghost" disabled={currentQuestionIndex === filteredQuestions.length - 1} onClick={() => { setCurrentQuestionIndex(currentQuestionIndex + 1); }} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          Next <ArrowRight size={15}/>
-                        </button>
-                      </div>
-                    </>
-                  )}
-
-                  {filteredQuestions.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '48px 0' }}>
-                      <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
-                      <p style={{ color: '#64748b', fontSize: 14 }}>No questions available for this topic yet.</p>
-                    </div>
-                  )}
-                </div>
-              </RevealWrap>
-            )}
-
-            {/* ── EXAM MODE ── */}
-            {examMode && (
-              <RevealWrap>
-                <div className="glass-card" style={{ padding: 28 }}>
-                  {!examStarted ? (
-                    /* start screen */
-                    <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                      <div style={{ fontSize: 52, marginBottom: 16 }}>🎯</div>
-                      <h2 style={{ fontSize: 24, fontWeight: 800, color: '#f1f5f9', marginBottom: 8 }}>Ready for Your Practice Exam?</h2>
-                      <p style={{ color: '#64748b', fontSize: 14, marginBottom: 28, maxWidth: 440, margin: '0 auto 28px' }}>
-                        You'll answer {Math.min(12, allQuestions.length)} randomly selected questions covering all CCNA domains. Take your time — there is no time limit.
-                      </p>
-                      <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-                        <button className="btn-primary" onClick={startExam} style={{ padding: '12px 32px', fontSize: 15 }}>Start Exam</button>
-                        <button className="btn-ghost" onClick={() => setExamMode(false)} style={{ padding: '12px 24px', fontSize: 15 }}>Cancel</button>
-                      </div>
-                    </div>
-                  ) : examCompleted ? (
-                    /* results screen */
-                    <div style={{ textAlign: 'center', padding: '32px 0' }}>
-                      <div style={{ fontSize: 56, marginBottom: 8 }}>{score >= Math.floor(activeExamQuestions.length * 0.8) ? '🎉' : score >= Math.floor(activeExamQuestions.length * 0.6) ? '👍' : '📚'}</div>
-                      <h2 style={{ fontSize: 26, fontWeight: 800, color: '#f1f5f9', marginBottom: 16 }}>Exam Complete</h2>
-                      {/* ring + score */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 32, marginBottom: 28 }}>
-                        <div style={{ position: 'relative', width: 100, height: 100 }}>
-                          <ProgressRing percent={Math.round((score / activeExamQuestions.length) * 100)} size={100} stroke={10} color={score / activeExamQuestions.length >= 0.8 ? '#10b981' : score / activeExamQuestions.length >= 0.6 ? '#f59e0b' : '#ef4444'}/>
-                          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-                            <span style={{ fontSize: 24, fontWeight: 800, color: '#f1f5f9' }}>{Math.round((score / activeExamQuestions.length) * 100)}%</span>
-                          </div>
-                        </div>
-                        <div style={{ textAlign: 'left' }}>
-                          <p style={{ fontSize: 14, color: '#64748b' }}>Score</p>
-                          <p style={{ fontSize: 28, fontWeight: 800, color: '#f1f5f9' }}>{score} <span style={{ fontSize: 16, fontWeight: 400, color: '#475569' }}>/ {activeExamQuestions.length}</span></p>
-                          <p style={{ fontSize: 13, color: score >= Math.floor(activeExamQuestions.length * 0.8) ? '#10b981' : score >= Math.floor(activeExamQuestions.length * 0.6) ? '#f59e0b' : '#ef4444', fontWeight: 600, marginTop: 4 }}>
-                            {score >= Math.floor(activeExamQuestions.length * 0.8) ? 'Excellent — CCNA ready!' : score >= Math.floor(activeExamQuestions.length * 0.6) ? 'Good — keep studying!' : 'Keep practicing, you\'ll get there!'}
-                          </p>
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-                        <button className="btn-primary" onClick={() => { setExamCompleted(false); startExam(); }} style={{ padding: '12px 28px', fontSize: 15, display: 'flex', alignItems: 'center', gap: 7 }}>
-                          <RefreshCw size={15}/> Retake
-                        </button>
-                        <button className="btn-ghost" onClick={() => { setExamMode(false); setExamStarted(false); setExamCompleted(false); }} style={{ padding: '12px 28px', fontSize: 15 }}>
-                          Back to Practice
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    /* active exam questions */
-                    <>
-                      {/* header */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <Clock size={16} color="#f59e0b"/>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: '#f59e0b' }}>Question {currentQuestionIndex + 1} / {activeExamQuestions.length}</span>
-                        </div>
-                        <button className="btn-primary" onClick={submitExam} style={{ padding: '8px 20px', fontSize: 13, background: 'linear-gradient(135deg,#10b981,#059669)', boxShadow: '0 2px 10px rgba(16,185,129,0.3)' }}>
-                          Submit Exam
-                        </button>
-                      </div>
-                      <div style={{ height: 3, background: '#1e293b', borderRadius: 2, marginBottom: 24, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${((currentQuestionIndex + 1) / activeExamQuestions.length) * 100}%`, background: 'linear-gradient(90deg,#f59e0b,#ef4444)', borderRadius: 2, transition: 'width 0.4s ease' }}/>
-                      </div>
-
-                      {activeExamQuestions[currentQuestionIndex] && (
-                        <>
-                          <div style={{ background: 'rgba(15,23,42,0.6)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)', padding: '20px 22px', marginBottom: 18 }}>
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                              <div style={{ width: 32, height: 32, borderRadius: 8, background: '#f59e0b22', border: '1px solid #f59e0b44', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: '#f59e0b', fontSize: 14, flexShrink: 0 }}>{currentQuestionIndex + 1}</div>
-                              <p style={{ fontSize: 16, fontWeight: 600, color: '#f1f5f9', lineHeight: 1.55 }}>{activeExamQuestions[currentQuestionIndex].question}</p>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
-                            {activeExamQuestions[currentQuestionIndex].options.map((opt, idx) => {
-                              const isSelected = selectedAnswers[currentQuestionIndex] === idx;
-                              let bg = 'rgba(30,41,59,0.5)', border = 'rgba(255,255,255,0.07)', textCol = '#cbd5e1';
-                              if (isSelected) { bg = 'rgba(245,158,11,0.12)'; border = '#f59e0b'; textCol = '#fff'; }
-                              return (
-                                <button key={idx} onClick={() => setSelectedAnswers({ ...selectedAnswers, [currentQuestionIndex]: idx })}
-                                  style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 18px', borderRadius: 10, background: bg, border: `1px solid ${border}`, cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left' }}>
-                                  <div style={{ width: 22, height: 22, borderRadius: '50%', border: `2px solid ${isSelected ? '#f59e0b' : '#334155'}`, background: isSelected ? '#f59e0b' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s' }}>
-                                    {isSelected && <Check size={13} color="#fff"/>}
-                                  </div>
-                                  <span style={{ fontSize: 14, color: textCol, fontWeight: isSelected ? 600 : 400 }}>{opt}</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <button className="btn-ghost" disabled={currentQuestionIndex === 0} onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <ArrowLeft size={15}/> Previous
-                            </button>
-                            <button className="btn-ghost" disabled={currentQuestionIndex === activeExamQuestions.length - 1} onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              Next <ArrowRight size={15}/>
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </>
-                  )}
-                </div>
-              </RevealWrap>
-            )}
-          </div>
-        )}
-
-        {/* ════════════════ LAB TAB ════════════════ */}
-        {activeTab === 'simulate' && (
-          <RevealWrap>
-            <NetworkSimulation />
-          </RevealWrap>
-        )}
-
-        {/* ════════════════ PROGRESS TAB ════════════════ */}
-        {activeTab === 'progress' && (
-          <div style={{ maxWidth: 780, margin: '0 auto' }}>
-            <RevealWrap>
-              {/* stat cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
-                {[
-                  { label: 'Questions Done', value: Object.keys(selectedAnswers).length, icon: Target, color: '#06b6d4' },
-                  { label: 'Correct', value: Object.keys(selectedAnswers).filter(i => { const q = allQuestions[parseInt(i)]; return q && selectedAnswers[i] === q.correctAnswer; }).length, icon: Check, color: '#10b981' },
-                  { label: 'Exams Taken', value: progress.exams?.length || 0, icon: Award, color: '#f59e0b' }
-                ].map((s, i) => {
-                  const Icon = s.icon;
-                  return (
-                    <div key={i} className="glass-card" style={{ padding: '20px 22px', borderTop: `2px solid ${s.color}` }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div>
-                          <p style={{ fontSize: 12, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{s.label}</p>
-                          <p style={{ fontSize: 34, fontWeight: 800, color: '#f1f5f9', marginTop: 4, letterSpacing: '-1px' }}>{s.value}</p>
-                        </div>
-                        <div style={{ width: 36, height: 36, borderRadius: 10, background: s.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Icon size={18} color={s.color}/>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
               </div>
-            </RevealWrap>
+              <div className="card">
+                <div className="card-head"><h3>{studyGuides[cat].title}</h3></div>
+                <div className="card-body">
+                  {studyGuides[cat].topics.map(t => (
+                    <div key={t.id} className="accord">
+                      <button className={`accord-head${openTopic===t.id?' open':''}`} onClick={()=>setOpen(openTopic===t.id?null:t.id)}>
+                        <span>{t.title}</span><span className="chevr">&#9654;</span>
+                      </button>
+                      {openTopic===t.id && <div className="accord-body">{renderContent(t.content)}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
-            <RevealWrap delay={100}>
-              <div className="glass-card" style={{ padding: 28 }}>
-                <h3 style={{ fontSize: 17, fontWeight: 700, color: '#f1f5f9', marginBottom: 18 }}>Exam History</h3>
-                {progress.exams && progress.exams.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {progress.exams.slice().reverse().map((exam, idx) => {
-                      const pct = exam.percentage;
-                      const col = pct >= 80 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444';
-                      return (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 18, padding: '16px 18px', borderRadius: 12, background: 'rgba(15,23,42,0.5)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                          <ProgressRing percent={pct} size={52} stroke={6} color={col}/>
-                          <div style={{ flex: 1 }}>
-                            <p style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9' }}>Mock Exam #{progress.exams.length - idx}</p>
-                            <p style={{ fontSize: 12, color: '#475569', marginTop: 2 }}>{new Date(exam.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                          </div>
-                          <div style={{ textAlign: 'right' }}>
-                            <p style={{ fontSize: 22, fontWeight: 800, color: col }}>{pct}%</p>
-                            <p style={{ fontSize: 12, color: '#475569' }}>{exam.score}/{exam.total}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
+        {/* PRACTICE */}
+        {tab === 'practice' && (() => {
+          if (examMode) {
+            if (!examStarted) return (
+              <>
+                <div className="section-hdr"><h2>Practice Exam</h2></div>
+                <div className="card"><div className="centered">
+                  <div className="c-icon"><svg viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="24" stroke="#f2c434" strokeWidth="2.5"/><path d="M28 14v14l9 5" stroke="#f2c434" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                  <h2>Ready for a Practice Exam?</h2>
+                  <p>12 shuffled questions drawn from all CCNA domains. Answers are locked until you submit.</p>
+                  <div className="btn-group">
+                    <button className="btn btn-gold" onClick={startExam}>Begin Exam</button>
+                    <button className="btn btn-outline" onClick={()=>setExamMode(false)}>Cancel</button>
                   </div>
-                ) : (
-                  <div style={{ textAlign: 'center', padding: '52px 0' }}>
-                    <div style={{ fontSize: 42, marginBottom: 14 }}>🎯</div>
-                    <h4 style={{ fontSize: 16, fontWeight: 700, color: '#cbd5e1', marginBottom: 6 }}>No exams yet</h4>
-                    <p style={{ fontSize: 13, color: '#64748b', marginBottom: 20 }}>Take a practice exam to start tracking your progress.</p>
-                    <button className="btn-primary" onClick={() => { setActiveTab('practice'); setExamMode(true); setExamStarted(false); }} style={{ padding: '10px 24px', fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                      <Zap size={15}/> Start Practice Exam
-                    </button>
+                </div></div>
+              </>
+            );
+            if (examDone) return (
+              <>
+                <div className="section-hdr"><h2>Exam Results</h2></div>
+                <div className="card"><div className="centered exam-result">
+                  <div className="c-icon"><svg viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="24" stroke={exScore>=10?'#1ea86a':'#e8a012'} strokeWidth="2.5"/><path d="M16 28l8 8 16-16" stroke={exScore>=10?'#1ea86a':'#e8a012'} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+                  <h2>Exam Complete</h2>
+                  <div className="big">{exScore} / {examQs.length}</div>
+                  <div className="pct">{Math.round(exScore/examQs.length*100)}% — {exScore>=10?'Excellent Work':'Keep Studying'}</div>
+                  <div className="btn-group">
+                    <button className="btn btn-gold" onClick={()=>{setExamMode(false);setExamStarted(false);setExamDone(false);}}>Back to Quiz</button>
+                    <button className="btn btn-outline" onClick={()=>{setExamDone(false);startExam();}}>Retake</button>
+                  </div>
+                </div></div>
+              </>
+            );
+            const q = examQs[exIdx];
+            return (
+              <>
+                <div className="section-hdr"><h2>Practice Exam</h2></div>
+                <div className="card">
+                  <div className="card-head"><h3>Question {exIdx+1} of {examQs.length}</h3><button className="btn btn-green" onClick={submitExam}>Submit Exam</button></div>
+                  <div className="card-body">
+                    <div className="progress-track"><div className="progress-fill" style={{width:`${(exIdx+1)/examQs.length*100}%`}}/></div>
+                    <div className="q-text">{q.question}</div>
+                    <div className="options">{q.options.map((o,i) => renderOpt(o,i,{ isExam:true, answerIdx:exAns[exIdx], onPick:i=>setExAns({...exAns,[exIdx]:i}) }))}</div>
+                    <div className="btn-row">
+                      <button className="btn btn-ghost" disabled={exIdx===0} onClick={()=>setExIdx(exIdx-1)}>← Previous</button>
+                      <button className="btn btn-ghost" disabled={exIdx===examQs.length-1} onClick={()=>setExIdx(exIdx+1)}>Next →</button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            );
+          }
+          const q = filteredQs[tpIdx];
+          return (
+            <>
+              <div className="section-hdr"><h2>Practice</h2></div>
+              <div className="mode-grid">
+                <div className="mode-card" onClick={()=>setExamMode(false)}>
+                  <div className="mc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c434" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h5a3 3 0 0 1 3 3v11a2 2 0 0 0-2-1H2z"/><path d="M22 3h-5a3 3 0 0 0-3 3v11a2 2 0 0 1 2-1h6z"/></svg></div>
+                  <h3>Topic by Topic</h3><p>Instant feedback after each answer</p>
+                </div>
+                <div className="mode-card" onClick={()=>{setExamMode(true);setExamStarted(false);setExamDone(false);}}>
+                  <div className="mc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c434" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+                  <h3>Timed Exam</h3><p>Simulate the real CCNA exam</p>
+                </div>
+              </div>
+              {filteredQs.length > 0 && (
+                <div className="card">
+                  <div className="card-head"><h3>Topic Practice</h3></div>
+                  <div className="card-body">
+                    <div className="sel-wrap">
+                      <select value={cat} onChange={e=>{setCat(e.target.value);setTpIdx(0);setTpAns({});setTpShow({});}}>
+                        {Object.entries(studyGuides).map(([k,v])=><option key={k} value={k}>{v.title}</option>)}
+                      </select>
+                    </div>
+                    <div className="q-meta"><span className="q-counter">{tpIdx+1} / {filteredQs.length}</span><span className={`q-badge ${q.difficulty}`}>{q.difficulty}</span></div>
+                    <div className="progress-track"><div className="progress-fill" style={{width:`${(tpIdx+1)/filteredQs.length*100}%`}}/></div>
+                    <div className="q-text">{q.question}</div>
+                    <div className="options">{q.options.map((o,i) => renderOpt(o,i,{ isExam:false, revealed:!!tpShow[tpIdx], answerIdx:tpAns[tpIdx], correctIdx:q.correctAnswer, onPick:i=>{ if(!tpShow[tpIdx]) setTpAns({...tpAns,[tpIdx]:i}); } }))}</div>
+                    {tpAns[tpIdx]!==undefined && !tpShow[tpIdx] && <button className="btn btn-gold btn-full" onClick={()=>setTpShow({...tpShow,[tpIdx]:true})}>Check Answer</button>}
+                    {tpShow[tpIdx] && (
+                      <div className={`feedback ${tpAns[tpIdx]===q.correctAnswer?'correct':'wrong'}`}>
+                        <div className="feedback-head"><strong>{tpAns[tpIdx]===q.correctAnswer?'Correct':'Incorrect'}</strong></div>
+                        <p>{q.explanation}</p>
+                      </div>
+                    )}
+                    <div className="btn-row">
+                      <button className="btn btn-ghost" disabled={tpIdx===0} onClick={()=>setTpIdx(tpIdx-1)}>← Previous</button>
+                      <button className="btn btn-ghost" disabled={tpIdx===filteredQs.length-1} onClick={()=>setTpIdx(tpIdx+1)}>Next →</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          );
+        })()}
+
+        {/* LAB */}
+        {tab === 'lab' && (
+          <>
+            <div className="section-hdr"><h2>Network Lab</h2></div>
+            <div className="card">
+              <div className="card-head"><h3>Topology Simulator — Click a Device</h3></div>
+              <div className="card-body"><NetworkLab/></div>
+            </div>
+          </>
+        )}
+
+        {/* PROGRESS */}
+        {tab === 'progress' && (() => {
+          const totalAns=Object.keys(tpAns).length;
+          const totalRight=Object.keys(tpAns).filter(i=>{ const q=examQuestions[parseInt(i)]; return q&&tpAns[i]===q.correctAnswer; }).length;
+          return (
+            <>
+              <div className="section-hdr"><h2>Progress & Stats</h2></div>
+              <div className="stats-grid">
+                <div className="stat-card blue"><div className="stat-card-top blue"/><div className="stat-card-inner"><div className="stat-card-label">Questions Answered</div><div className="s-val">{totalAns}</div><div className="s-sub">Total attempts</div></div></div>
+                <div className="stat-card green"><div className="stat-card-top green"/><div className="stat-card-inner"><div className="stat-card-label">Correct Answers</div><div className="s-val">{totalRight}</div><div className="s-sub">Right answers</div></div></div>
+                <div className="stat-card amber"><div className="stat-card-top amber"/><div className="stat-card-inner"><div className="stat-card-label">Exams Taken</div><div className="s-val">{progress.exams?.length||0}</div><div className="s-sub">Completed</div></div></div>
+              </div>
+              <div className="card">
+                <div className="card-head"><h3>Exam History</h3></div>
+                {progress.exams && progress.exams.length>0 ? progress.exams.slice().reverse().map((e,i) => (
+                  <div key={i} className="history-row">
+                    <div><div className="hr-title">Mock Exam #{progress.exams.length-i}</div><div className="hr-date">{new Date(e.date).toLocaleDateString()}</div></div>
+                    <div style={{textAlign:'right'}}><div className={`hr-score ${e.percentage>=80?'pass':e.percentage>=60?'mid':'fail'}`}>{e.percentage}%</div><div className="hr-sub">{e.score} / {e.total}</div></div>
+                  </div>
+                )) : (
+                  <div className="centered">
+                    <div className="c-icon"><svg viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="24" stroke="#7a95b0" strokeWidth="2"/><path d="M22 28h12M28 22v12" stroke="#7a95b0" strokeWidth="2.5" strokeLinecap="round"/></svg></div>
+                    <h2>No Exams Yet</h2>
+                    <p>Take a practice exam to start tracking your performance over time.</p>
+                    <button className="btn btn-gold" onClick={()=>{setTab('practice');setExamMode(true);setExamStarted(false);}}>Start Practice Exam</button>
                   </div>
                 )}
               </div>
-            </RevealWrap>
-          </div>
-        )}
-      </main>
+            </>
+          );
+        })()}
+      </div>
+      <div className="footer-stripe"/>
     </div>
   );
-};
-
-export default CCNATrainer;
+}
