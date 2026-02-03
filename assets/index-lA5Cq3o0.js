@@ -38,28 +38,28 @@ interface Gi0/0
 ip dhcp pool SALES
  network 10.1.10.0 255.255.255.0
  default-router 10.1.1.1`}],sm=[{from:1,to:2,label:"Gi0/0"},{from:2,to:3,label:"Fa0/2"},{from:2,to:4,label:"Fa0/3"},{from:2,to:5,label:"Gi0/4"}],om=`
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
 @font-face {
   font-family: 'Liberator';
-  src: url('./fonts/Liberator-Heavy.ttf') format('truetype');
+  src: url('/fonts/Liberator-Heavy.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Liberator';
-  src: url('./fonts/Liberator-Medium.ttf') format('truetype');
+  src: url('/fonts/Liberator-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Liberator';
-  src: url('./fonts/Liberator-Light.ttf') format('truetype');
+  src: url('/fonts/Liberator-Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
 
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
