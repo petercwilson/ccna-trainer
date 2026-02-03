@@ -487,3 +487,116 @@ html, body {
 
 /* ═══ FOOTER STRIPE ═══ */
 .footer-stripe { height:6px; background:linear-gradient(90deg, var(--navy-dark) 0%, var(--gold) 30%, var(--gold) 70%, var(--navy-dark) 100%); position:fixed; bottom:0; left:0; right:0; z-index:50; }
+
+/* ═══ ERROR BOUNDARY ═══ */
+.error-boundary-fallback {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--navy-dark);
+  padding: 40px 20px;
+}
+
+.error-boundary-content {
+  max-width: 600px;
+  text-align: center;
+  background: var(--navy-mid);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 48px 40px;
+}
+
+.error-icon {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.error-boundary-content h2 {
+  font-family: 'Liberator', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.error-message {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.error-details {
+  background: var(--navy-dark);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  margin: 24px 0;
+  text-align: left;
+}
+
+.error-details summary {
+  cursor: pointer;
+  font-family: 'Liberator', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+}
+
+.error-details summary:hover {
+  color: var(--gold);
+}
+
+.error-stack {
+  background: #000;
+  color: #0f0;
+  padding: 16px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error-stack strong {
+  color: var(--red);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.error-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-fallback {
+  margin-bottom: 24px;
+}
+
+.inline-error {
+  animation: fadeDown 0.3s ease;
+}
+
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

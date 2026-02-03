@@ -4,6 +4,7 @@ import { TopBar } from './components/TopBar';
 import { Hero } from './components/Hero';
 import { StudyGuide } from './components/StudyGuide/StudyGuide';
 import { NetworkLab } from './components/NetworkLab/NetworkLab';
+import { ErrorBoundary, ErrorFallback } from './components/ErrorBoundary';
 import { examQuestions } from './data/examQuestions';
 import { studyGuides } from './data/studyGuides';
 
@@ -205,27 +206,97 @@ export default function CCNATrainer() {
   const [tab, setTab] = useState('study');
 
   return (
-    <div>
-      <TopBar activeTab={tab} onTabChange={setTab} />
-      <Hero />
+    <ErrorBoundary friendlyMessage="The CCNA Trainer application encountered an unexpected error. Please refresh the page to continue.">
+      <div>
+        <ErrorBoundary
+          fallback={
+            <div style={{ background: 'var(--navy-dark)', padding: '20px' }}>
+              <ErrorFallback
+                title="Navigation Error"
+                message="Unable to load the navigation. Please refresh the page."
+              />
+            </div>
+          }
+        >
+          <TopBar activeTab={tab} onTabChange={setTab} />
+        </ErrorBoundary>
 
-      {/* Main content */}
-      <main className="shell" role="main">
-        <div role="tabpanel" id="study-panel" aria-labelledby="study-tab" hidden={tab !== 'study'}>
-          {tab === 'study' && <StudyGuide />}
-        </div>
-        <div role="tabpanel" id="practice-panel" aria-labelledby="practice-tab" hidden={tab !== 'practice'}>
-          {tab === 'practice' && <PracticeQuiz />}
-        </div>
-        <div role="tabpanel" id="lab-panel" aria-labelledby="lab-tab" hidden={tab !== 'lab'}>
-          {tab === 'lab' && <NetworkLab />}
-        </div>
-        <div role="tabpanel" id="progress-panel" aria-labelledby="progress-tab" hidden={tab !== 'progress'}>
-          {tab === 'progress' && <ProgressView />}
-        </div>
-      </main>
+        <ErrorBoundary
+          fallback={
+            <div style={{ background: 'var(--navy-dark)', padding: '40px 20px', textAlign: 'center' }}>
+              <p style={{ color: 'var(--muted)' }}>Unable to load hero section</p>
+            </div>
+          }
+        >
+          <Hero />
+        </ErrorBoundary>
 
-      <div className="footer-stripe" role="presentation" aria-hidden="true"/>
-    </div>
+        {/* Main content */}
+        <main className="shell" role="main">
+          <div role="tabpanel" id="study-panel" aria-labelledby="study-tab" hidden={tab !== 'study'}>
+            {tab === 'study' && (
+              <ErrorBoundary
+                fallback={
+                  <ErrorFallback
+                    title="Study Guide Error"
+                    message="Unable to load study guides. Please try refreshing the page."
+                    onReset={() => window.location.reload()}
+                  />
+                }
+              >
+                <StudyGuide />
+              </ErrorBoundary>
+            )}
+          </div>
+          <div role="tabpanel" id="practice-panel" aria-labelledby="practice-tab" hidden={tab !== 'practice'}>
+            {tab === 'practice' && (
+              <ErrorBoundary
+                fallback={
+                  <ErrorFallback
+                    title="Quiz Error"
+                    message="Unable to load quiz questions. Please try again."
+                    onReset={() => window.location.reload()}
+                  />
+                }
+              >
+                <PracticeQuiz />
+              </ErrorBoundary>
+            )}
+          </div>
+          <div role="tabpanel" id="lab-panel" aria-labelledby="lab-tab" hidden={tab !== 'lab'}>
+            {tab === 'lab' && (
+              <ErrorBoundary
+                fallback={
+                  <ErrorFallback
+                    title="Network Lab Error"
+                    message="Unable to load the network topology simulator."
+                    onReset={() => window.location.reload()}
+                  />
+                }
+              >
+                <NetworkLab />
+              </ErrorBoundary>
+            )}
+          </div>
+          <div role="tabpanel" id="progress-panel" aria-labelledby="progress-tab" hidden={tab !== 'progress'}>
+            {tab === 'progress' && (
+              <ErrorBoundary
+                fallback={
+                  <ErrorFallback
+                    title="Progress Tracking Error"
+                    message="Unable to load your progress data."
+                    onReset={() => window.location.reload()}
+                  />
+                }
+              >
+                <ProgressView />
+              </ErrorBoundary>
+            )}
+          </div>
+        </main>
+
+        <div className="footer-stripe" role="presentation" aria-hidden="true"/>
+      </div>
+    </ErrorBoundary>
   );
 }
