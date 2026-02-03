@@ -678,21 +678,21 @@ export default function CCNATrainer() {
     tag.textContent = `
       @font-face {
         font-family: 'Liberator';
-        src: url('/fonts/Liberator-Heavy.ttf') format('truetype');
+        src: url('fonts/Liberator-Heavy.ttf') format('truetype');
         font-weight: 700;
         font-style: normal;
         font-display: swap;
       }
       @font-face {
         font-family: 'Liberator';
-        src: url('/fonts/Liberator-Medium.ttf') format('truetype');
+        src: url('fonts/Liberator-Medium.ttf') format('truetype');
         font-weight: 500;
         font-style: normal;
         font-display: swap;
       }
       @font-face {
         font-family: 'Liberator';
-        src: url('/fonts/Liberator-Light.ttf') format('truetype');
+        src: url('fonts/Liberator-Light.ttf') format('truetype');
         font-weight: 300;
         font-style: normal;
         font-display: swap;
