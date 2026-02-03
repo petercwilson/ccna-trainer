@@ -127,8 +127,28 @@ const topoLinks = [
 
 /* ══════════════════════════ STYLES ════════════════════════════ */
 const STYLE = `
-@import url(https://db.onlinewebfonts.com/c/5d7e9c15851618f02f88a3afad26de8d?family=Liberator);
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
+@font-face {
+  font-family: 'Liberator';
+  src: url('/fonts/Liberator-Heavy.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Liberator';
+  src: url('/fonts/Liberator-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Liberator';
+  src: url('/fonts/Liberator-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
 
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
@@ -179,7 +199,7 @@ html, body {
 }
 .topbar-logo-text {
   font-family:'Liberator',sans-serif;
-  font-size:20px; font-weight:600;
+  font-size:20px; font-weight:700;
   color:var(--white);
   text-transform:uppercase;
   letter-spacing:2.5px;
@@ -187,7 +207,7 @@ html, body {
 }
 .topbar-logo-text span {
   display:block;
-  font-size:10px; font-weight:400;
+  font-size:10px; font-weight:300;
   letter-spacing:3px;
   color:var(--muted);
   margin-top:3px;
@@ -269,7 +289,7 @@ html, body {
 .section-hdr { margin-bottom:24px; border-bottom:2px solid var(--border); }
 .section-hdr h2 {
   font-family:'Liberator',sans-serif;
-  font-size:22px; font-weight:600;
+  font-size:22px; font-weight:500;
   color:var(--white);
   text-transform:uppercase;
   letter-spacing:2px;
@@ -288,7 +308,7 @@ html, body {
 }
 .card-head h3 {
   font-family:'Liberator',sans-serif;
-  font-size:16px; font-weight:600;
+  font-size:16px; font-weight:500;
   color:var(--white);
   text-transform:uppercase; letter-spacing:1.8px;
 }
@@ -341,7 +361,7 @@ html, body {
 
 /* ═══ CONTENT ═══ */
 .c-heading {
-  font-family:'Liberator',sans-serif; font-size:14px; font-weight:600;
+  font-family:'Liberator',sans-serif; font-size:14px; font-weight:500;
   color:var(--gold); text-transform:uppercase; letter-spacing:1.5px;
   margin:18px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border);
 }
@@ -374,7 +394,7 @@ html, body {
 }
 .mode-card .mc-icon svg { width:24px; height:24px; }
 .mode-card h3 {
-  font-family:'Liberator',sans-serif; font-size:19px; font-weight:600;
+  font-family:'Liberator',sans-serif; font-size:19px; font-weight:700;
   color:var(--white); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;
 }
 .mode-card p { font-size:14px; color:var(--muted); }
@@ -383,7 +403,7 @@ html, body {
 .q-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .q-counter { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--muted); }
 .q-badge {
-  font-family:'Liberator',sans-serif; font-size:11px; font-weight:600;
+  font-family:'Liberator',sans-serif; font-size:11px; font-weight:500;
   letter-spacing:1.2px; text-transform:uppercase; padding:3px 12px; border-radius:3px;
 }
 .q-badge.easy   { background:var(--green-bg); color:var(--green); border:1px solid rgba(30,168,106,.3); }
@@ -428,7 +448,7 @@ html, body {
 .feedback.correct { background:var(--green-bg); border-left-color:var(--green); }
 .feedback.wrong   { background:var(--red-bg);   border-left-color:var(--red); }
 .feedback-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-.feedback-head strong { font-size:15px; font-family:'Liberator',sans-serif; text-transform:uppercase; letter-spacing:1px; }
+.feedback-head strong { font-size:15px; font-family:'Liberator',sans-serif; font-weight:500; text-transform:uppercase; letter-spacing:1px; }
 .feedback.correct .feedback-head strong { color:var(--green); }
 .feedback.wrong   .feedback-head strong { color:var(--red); }
 .feedback p { font-size:14px; color:var(--off-white); line-height:1.55; }
@@ -436,7 +456,7 @@ html, body {
 /* ═══ BUTTONS ═══ */
 .btn {
   padding:11px 26px; border-radius:4px; border:none;
-  font-family:'Liberator',sans-serif; font-size:15px; font-weight:600;
+  font-family:'Liberator',sans-serif; font-size:15px; font-weight:700;
   text-transform:uppercase; letter-spacing:1.8px;
   cursor:pointer; transition:all .15s;
 }
@@ -484,7 +504,7 @@ html, body {
 .device.sel .dv-wrap { border-color:var(--gold); box-shadow:0 0 0 3px rgba(242,196,52,.25); }
 .device .dv-label {
   margin-top:6px; font-family:'Liberator',sans-serif;
-  font-size:11px; font-weight:600; letter-spacing:1.5px;
+  font-size:11px; font-weight:300; letter-spacing:1.5px;
   text-transform:uppercase; color:var(--muted);
 }
 .device.sel .dv-label { color:var(--gold); }
@@ -496,7 +516,7 @@ html, body {
   background:var(--navy-dark); border-bottom:1px solid var(--border);
   padding:10px 16px; display:flex; justify-content:space-between; align-items:center;
 }
-.cfg-panel-head span { font-family:'Liberator',sans-serif; font-size:13px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; }
+.cfg-panel-head span { font-family:'Liberator',sans-serif; font-size:13px; font-weight:500; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; }
 .cfg-panel-head button { background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; line-height:1; }
 .cfg-panel-head button:hover { color:var(--white); }
 .cfg-code { background:var(--navy-dark); padding:16px 18px; font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--green); line-height:1.8; white-space:pre; overflow-x:auto; }
@@ -539,7 +559,7 @@ html, body {
 .centered { text-align:center; padding:56px 24px 40px; }
 .centered .c-icon { margin-bottom:18px; }
 .centered .c-icon svg { width:56px; height:56px; }
-.centered h2 { font-family:'Liberator',sans-serif; font-size:24px; font-weight:600; color:var(--white); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; }
+.centered h2 { font-family:'Liberator',sans-serif; font-size:24px; font-weight:500; color:var(--white); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; }
 .centered p { font-size:15px; color:var(--muted); margin-bottom:24px; max-width:460px; margin-left:auto; margin-right:auto; }
 .centered .btn-group { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 .exam-result .big { font-family:'Liberator',sans-serif; font-size:64px; font-weight:700; color:var(--gold); margin:8px 0; }
