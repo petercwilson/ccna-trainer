@@ -4,6 +4,7 @@ import { TopBar } from './components/TopBar';
 import { Hero } from './components/Hero';
 import { StudyGuide } from './components/StudyGuide/StudyGuide';
 import { NetworkLab } from './components/NetworkLab/NetworkLab';
+import { PacketTracer } from './components/PacketTracer/PacketTracer';
 import { ErrorBoundary, ErrorFallback } from './components/ErrorBoundary';
 import { examQuestions } from './data/examQuestions';
 import { studyGuides } from './data/studyGuides';
@@ -295,6 +296,21 @@ export default function CCNATrainer() {
                 }
               >
                 <NetworkLab />
+              </ErrorBoundary>
+            )}
+          </div>
+          <div role="tabpanel" id="simulator-panel" aria-labelledby="simulator-tab" hidden={tab !== 'simulator'}>
+            {tab === 'simulator' && (
+              <ErrorBoundary
+                fallback={
+                  <ErrorFallback
+                    title="Packet Tracer Error"
+                    message="Unable to load the Packet Tracer simulator."
+                    onReset={() => window.location.reload()}
+                  />
+                }
+              >
+                <PacketTracer />
               </ErrorBoundary>
             )}
           </div>

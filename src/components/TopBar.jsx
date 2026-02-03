@@ -5,6 +5,7 @@ const navItems = [
   { id: 'study', label: 'Study' },
   { id: 'practice', label: 'Quiz' },
   { id: 'lab', label: 'Network Lab' },
+  { id: 'simulator', label: 'Packet Tracer' },
   { id: 'progress', label: 'Stats' }
 ];
 
