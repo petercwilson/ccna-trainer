@@ -248,22 +248,6 @@ export default function CCNATrainer() {
   });
   useEffect(()=>{ localStorage.setItem('ccna-progress', JSON.stringify(progress)); }, [progress]);
 
-  useEffect(()=>{
-    const tag = document.createElement('style');
-    tag.id = 'liberator-fonts';
-    tag.textContent = `
-      @font-face {
-        font-family: 'Liberator';
-        src: url('/fonts/Liberator-Heavy.ttf') format('truetype');
-        font-weight: 700;
-        font-style: normal;
-        font-display: swap;
-      }
-    `;
-    document.head.appendChild(tag);
-    return ()=>{ if(tag.parentNode) document.head.removeChild(tag); };
-  }, []);
-
   const filteredQs = examQuestions.filter(q => q.category === cat);
   const startExam = () => {
     setExamQs([...examQuestions].sort(()=>Math.random()-.5).slice(0,12));
