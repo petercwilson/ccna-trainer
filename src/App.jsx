@@ -7,13 +7,21 @@ import { NetworkLab } from './components/NetworkLab/NetworkLab';
 import { ErrorBoundary, ErrorFallback } from './components/ErrorBoundary';
 import { examQuestions } from './data/examQuestions';
 import { studyGuides } from './data/studyGuides';
+import {
+  getProgress,
+  setProgress,
+  getTopicAnswers,
+  setTopicAnswers,
+  getTopicShown,
+  setTopicShown
+} from './utils/storage';
 
 // Simplified Quiz/Practice component (keeping original logic for now)
 const PracticeQuiz = () => {
   const [cat, setCat] = useState('network-fundamentals');
   const [tpIdx, setTpIdx] = useState(0);
-  const [tpAns, setTpAns] = useState({});
-  const [tpShow, setTpShow] = useState({});
+  const [tpAns, setTpAns] = useState(() => getTopicAnswers());
+  const [tpShow, setTpShow] = useState(() => getTopicShown());
   const [examMode, setExamMode] = useState(false);
   const [examQs, setExamQs] = useState([]);
   const [examStarted, setExamStarted] = useState(false);
@@ -21,11 +29,22 @@ const PracticeQuiz = () => {
   const [exIdx, setExIdx] = useState(0);
   const [exAns, setExAns] = useState({});
   const [exScore, setExScore] = useState(0);
-  const [progress, setProgress] = useState(()=>{
-    try{ const s=localStorage.getItem('ccna-progress'); return s?JSON.parse(s):{}; } catch(e){ return {}; }
-  });
+  const [progress, setProgressState] = useState(() => getProgress());
 
-  useEffect(()=>{ localStorage.setItem('ccna-progress', JSON.stringify(progress)); }, [progress]);
+  // Save progress to localStorage when it changes
+  useEffect(() => {
+    setProgress(progress);
+  }, [progress]);
+
+  // Save topic answers when they change
+  useEffect(() => {
+    setTopicAnswers(tpAns);
+  }, [tpAns]);
+
+  // Save topic shown state when it changes
+  useEffect(() => {
+    setTopicShown(tpShow);
+  }, [tpShow]);
 
   const filteredQs = examQuestions.filter(q => q.category === cat);
 
@@ -39,7 +58,7 @@ const PracticeQuiz = () => {
     setExScore(c); setExamDone(true);
     const p={...progress}; if(!p.exams) p.exams=[];
     p.exams.push({ date:new Date().toISOString(), score:c, total:examQs.length, percentage:Math.round(c/examQs.length*100) });
-    setProgress(p);
+    setProgressState(p);
   };
 
   const renderOpt = (option, idx, { isExam, revealed, answerIdx, correctIdx, onPick }) => {
@@ -166,13 +185,14 @@ const PracticeQuiz = () => {
 
 // Simplified Progress component
 const ProgressView = () => {
-  const [tpAns] = useState({});
-  const [progress, setProgress] = useState(()=>{
-    try{ const s=localStorage.getItem('ccna-progress'); return s?JSON.parse(s):{}; } catch(e){ return {}; }
-  });
+  const [tpAns] = useState(() => getTopicAnswers());
+  const [progress] = useState(() => getProgress());
 
-  const totalAns=Object.keys(tpAns).length;
-  const totalRight=Object.keys(tpAns).filter(i=>{ const q=examQuestions[parseInt(i)]; return q&&tpAns[i]===q.correctAnswer; }).length;
+  const totalAns = Object.keys(tpAns).length;
+  const totalRight = Object.keys(tpAns).filter(i => {
+    const q = examQuestions[parseInt(i)];
+    return q && tpAns[i] === q.correctAnswer;
+  }).length;
 
   return (
     <>
