@@ -127,7 +127,8 @@ const topoLinks = [
 
 /* ══════════════════════════ STYLES ════════════════════════════ */
 const STYLE = `
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap');
+@import url(https://db.onlinewebfonts.com/c/5d7e9c15851618f02f88a3afad26de8d?family=Liberator);
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
 
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
@@ -154,7 +155,7 @@ html, body {
   min-height:100%;
   background:var(--navy-dark);
   color:var(--off-white);
-  font-family:'Source Sans 3', sans-serif;
+  font-family:'Roboto Slab', sans-serif;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
@@ -177,7 +178,7 @@ html, body {
   display:flex; align-items:center; gap:14px;
 }
 .topbar-logo-text {
-  font-family:'Oswald',sans-serif;
+  font-family:'Liberator',sans-serif;
   font-size:20px; font-weight:600;
   color:var(--white);
   text-transform:uppercase;
@@ -194,7 +195,7 @@ html, body {
 .topbar-nav { display:flex; gap:2px; }
 .topbar-nav button {
   background:none; border:none;
-  font-family:'Oswald',sans-serif;
+  font-family:'Liberator',sans-serif;
   font-size:14px; font-weight:500;
   color:var(--muted);
   text-transform:uppercase;
@@ -235,7 +236,7 @@ html, body {
 }
 .hero-content { flex:1; }
 .hero-content h1 {
-  font-family:'Oswald',sans-serif;
+  font-family:'Liberator',sans-serif;
   font-size:52px; font-weight:700;
   color:var(--white);
   text-transform:uppercase;
@@ -254,7 +255,7 @@ html, body {
   background:rgba(255,255,255,.08);
   border:1px solid rgba(255,255,255,.15);
   color:var(--off-white);
-  font-family:'Oswald',sans-serif;
+  font-family:'Liberator',sans-serif;
   font-size:13px; font-weight:500;
   text-transform:uppercase; letter-spacing:1.5px;
   padding:6px 16px; border-radius:3px;
@@ -267,7 +268,7 @@ html, body {
 /* ═══ SECTION HEADER ═══ */
 .section-hdr { margin-bottom:24px; border-bottom:2px solid var(--border); }
 .section-hdr h2 {
-  font-family:'Oswald',sans-serif;
+  font-family:'Liberator',sans-serif;
   font-size:22px; font-weight:600;
   color:var(--white);
   text-transform:uppercase;
@@ -286,7 +287,7 @@ html, body {
   display:flex; align-items:center; justify-content:space-between;
 }
 .card-head h3 {
-  font-family:'Oswald',sans-serif;
+  font-family:'Liberator',sans-serif;
   font-size:16px; font-weight:600;
   color:var(--white);
   text-transform:uppercase; letter-spacing:1.8px;
@@ -304,7 +305,7 @@ html, body {
   background:transparent; border:none;
   border-bottom:1px solid var(--border);
   color:var(--muted);
-  font-family:'Source Sans 3',sans-serif;
+  font-family:'Roboto Slab',sans-serif;
   font-size:15px; font-weight:600;
   cursor:pointer; text-align:left; width:100%;
   transition:background .15s, color .15s;
@@ -328,7 +329,7 @@ html, body {
   display:flex; justify-content:space-between; align-items:center;
   padding:15px 0; background:none; border:none; width:100%;
   cursor:pointer; color:var(--off-white);
-  font-family:'Source Sans 3',sans-serif; font-size:16px; font-weight:600;
+  font-family:'Roboto Slab',sans-serif; font-size:16px; font-weight:600;
   text-align:left; transition:color .15s;
 }
 .accord-head:hover { color:var(--gold); }
@@ -340,7 +341,7 @@ html, body {
 
 /* ═══ CONTENT ═══ */
 .c-heading {
-  font-family:'Oswald',sans-serif; font-size:14px; font-weight:600;
+  font-family:'Liberator',sans-serif; font-size:14px; font-weight:600;
   color:var(--gold); text-transform:uppercase; letter-spacing:1.5px;
   margin:18px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border);
 }
@@ -373,7 +374,7 @@ html, body {
 }
 .mode-card .mc-icon svg { width:24px; height:24px; }
 .mode-card h3 {
-  font-family:'Oswald',sans-serif; font-size:19px; font-weight:600;
+  font-family:'Liberator',sans-serif; font-size:19px; font-weight:600;
   color:var(--white); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;
 }
 .mode-card p { font-size:14px; color:var(--muted); }
@@ -382,7 +383,7 @@ html, body {
 .q-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .q-counter { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--muted); }
 .q-badge {
-  font-family:'Oswald',sans-serif; font-size:11px; font-weight:600;
+  font-family:'Liberator',sans-serif; font-size:11px; font-weight:600;
   letter-spacing:1.2px; text-transform:uppercase; padding:3px 12px; border-radius:3px;
 }
 .q-badge.easy   { background:var(--green-bg); color:var(--green); border:1px solid rgba(30,168,106,.3); }
@@ -405,7 +406,7 @@ html, body {
   border:2px solid var(--border); background:var(--navy-dark);
   color:var(--off-white); font-size:15px;
   cursor:pointer; transition:all .15s; text-align:left;
-  font-family:'Source Sans 3',sans-serif;
+  font-family:'Roboto Slab',sans-serif;
 }
 .opt:hover:not([disabled]) { border-color:var(--muted); background:rgba(255,255,255,.04); }
 .opt.sel     { border-color:var(--gold);  background:rgba(242,196,52,.08); color:var(--white); }
@@ -427,7 +428,7 @@ html, body {
 .feedback.correct { background:var(--green-bg); border-left-color:var(--green); }
 .feedback.wrong   { background:var(--red-bg);   border-left-color:var(--red); }
 .feedback-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-.feedback-head strong { font-size:15px; font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:1px; }
+.feedback-head strong { font-size:15px; font-family:'Liberator',sans-serif; text-transform:uppercase; letter-spacing:1px; }
 .feedback.correct .feedback-head strong { color:var(--green); }
 .feedback.wrong   .feedback-head strong { color:var(--red); }
 .feedback p { font-size:14px; color:var(--off-white); line-height:1.55; }
@@ -435,7 +436,7 @@ html, body {
 /* ═══ BUTTONS ═══ */
 .btn {
   padding:11px 26px; border-radius:4px; border:none;
-  font-family:'Oswald',sans-serif; font-size:15px; font-weight:600;
+  font-family:'Liberator',sans-serif; font-size:15px; font-weight:600;
   text-transform:uppercase; letter-spacing:1.8px;
   cursor:pointer; transition:all .15s;
 }
@@ -457,7 +458,7 @@ html, body {
 .sel-wrap select {
   width:100%; padding:11px 40px 11px 16px; border-radius:4px; appearance:none;
   border:2px solid var(--border); background:var(--navy-dark);
-  color:var(--white); font-family:'Source Sans 3',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  color:var(--white); font-family:'Roboto Slab',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
 }
 .sel-wrap select:focus { outline:none; border-color:var(--gold); }
 .sel-wrap select option { background:var(--navy-dark); color:#fff; }
@@ -482,7 +483,7 @@ html, body {
 }
 .device.sel .dv-wrap { border-color:var(--gold); box-shadow:0 0 0 3px rgba(242,196,52,.25); }
 .device .dv-label {
-  margin-top:6px; font-family:'Oswald',sans-serif;
+  margin-top:6px; font-family:'Liberator',sans-serif;
   font-size:11px; font-weight:600; letter-spacing:1.5px;
   text-transform:uppercase; color:var(--muted);
 }
@@ -495,7 +496,7 @@ html, body {
   background:var(--navy-dark); border-bottom:1px solid var(--border);
   padding:10px 16px; display:flex; justify-content:space-between; align-items:center;
 }
-.cfg-panel-head span { font-family:'Oswald',sans-serif; font-size:13px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; }
+.cfg-panel-head span { font-family:'Liberator',sans-serif; font-size:13px; font-weight:600; color:var(--gold); text-transform:uppercase; letter-spacing:1.5px; }
 .cfg-panel-head button { background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; line-height:1; }
 .cfg-panel-head button:hover { color:var(--white); }
 .cfg-code { background:var(--navy-dark); padding:16px 18px; font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--green); line-height:1.8; white-space:pre; overflow-x:auto; }
@@ -504,7 +505,7 @@ html, body {
   flex:1; padding:10px 4px; border-radius:4px;
   border:1px solid var(--border); background:var(--navy-dark);
   cursor:pointer; text-align:center;
-  font-family:'Oswald',sans-serif; font-size:11px; font-weight:500;
+  font-family:'Liberator',sans-serif; font-size:11px; font-weight:500;
   color:var(--muted); letter-spacing:1px; text-transform:uppercase; transition:all .15s;
 }
 .palette-item:hover { border-color:var(--gold); color:var(--gold); }
@@ -518,8 +519,8 @@ html, body {
 .stat-card-top.green { background:var(--green); }
 .stat-card-top.amber { background:var(--amber); }
 .stat-card-inner { padding:18px 20px; }
-.stat-card-label { font-family:'Oswald',sans-serif; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:1.8px; color:var(--muted); margin-bottom:8px; }
-.stat-card .s-val { font-family:'Oswald',sans-serif; font-size:38px; font-weight:700; line-height:1; }
+.stat-card-label { font-family:'Liberator',sans-serif; font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:1.8px; color:var(--muted); margin-bottom:8px; }
+.stat-card .s-val { font-family:'Liberator',sans-serif; font-size:38px; font-weight:700; line-height:1; }
 .stat-card.blue  .s-val { color:var(--gold); }
 .stat-card.green .s-val { color:var(--green); }
 .stat-card.amber .s-val { color:var(--amber); }
@@ -528,7 +529,7 @@ html, body {
 .history-row:last-child { border-bottom:none; }
 .history-row .hr-title { font-size:15px; font-weight:600; color:var(--white); }
 .history-row .hr-date  { font-size:12px; color:var(--muted); margin-top:2px; font-family:'Share Tech Mono',monospace; }
-.history-row .hr-score { font-family:'Oswald',sans-serif; font-size:24px; font-weight:700; }
+.history-row .hr-score { font-family:'Liberator',sans-serif; font-size:24px; font-weight:700; }
 .history-row .hr-sub   { font-size:12px; color:var(--muted); text-align:right; margin-top:2px; font-family:'Share Tech Mono',monospace; }
 .hr-score.pass { color:var(--green); }
 .hr-score.mid  { color:var(--amber); }
@@ -538,10 +539,10 @@ html, body {
 .centered { text-align:center; padding:56px 24px 40px; }
 .centered .c-icon { margin-bottom:18px; }
 .centered .c-icon svg { width:56px; height:56px; }
-.centered h2 { font-family:'Oswald',sans-serif; font-size:24px; font-weight:600; color:var(--white); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; }
+.centered h2 { font-family:'Liberator',sans-serif; font-size:24px; font-weight:600; color:var(--white); text-transform:uppercase; letter-spacing:2px; margin-bottom:10px; }
 .centered p { font-size:15px; color:var(--muted); margin-bottom:24px; max-width:460px; margin-left:auto; margin-right:auto; }
 .centered .btn-group { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-.exam-result .big { font-family:'Oswald',sans-serif; font-size:64px; font-weight:700; color:var(--gold); margin:8px 0; }
+.exam-result .big { font-family:'Liberator',sans-serif; font-size:64px; font-weight:700; color:var(--gold); margin:8px 0; }
 .exam-result .pct { font-size:17px; color:var(--muted); margin-bottom:28px; }
 .exam-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .exam-nav .en-left { font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--muted); }
@@ -689,7 +690,7 @@ export default function CCNATrainer() {
     <svg width={size} height={size} viewBox="0 0 56 56" fill="none" opacity={opacity}>
       <path d="M28 4L6 14v16c0 12.5 9.5 23.5 22 26 12.5-2.5 22-13.5 22-26V14L28 4z" stroke="#f2c434" strokeWidth="2" fill="none"/>
       <path d="M28 12L12 19v11c0 9 7 17.5 16 19.5 9-2 16-10.5 16-19.5V19L28 12z" stroke="#f2c434" strokeWidth="1" fill="rgba(242,196,52,.06)"/>
-      <text x="28" y="33" textAnchor="middle" fill="#f2c434" fontFamily="Oswald,sans-serif" fontSize="16" fontWeight="700">CC</text>
+      <text x="28" y="33" textAnchor="middle" fill="#f2c434" fontFamily="Liberator,sans-serif" fontSize="16" fontWeight="700">CC</text>
       <text x="28" y="41" textAnchor="middle" fill="#7a95b0" fontFamily="Share Tech Mono,monospace" fontSize="6.5">CCNA</text>
     </svg>
   );
