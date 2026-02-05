@@ -18,38 +18,40 @@ export const PacketTracer = () => {
 
   // Add device to topology
   const addDevice = useCallback((type, position) => {
-    console.log('Adding device:', type, 'at position:', position);
-    const newDevice = {
-      id: `${type}-${Date.now()}`,
-      type,
-      x: position.x,
-      y: position.y,
-      hostname: `${type}${devices.length + 1}`,
-      interfaces: type === 'router' ? [
-        { name: 'GigabitEthernet0/0', ip: '', subnet: '', status: 'down' },
-        { name: 'GigabitEthernet0/1', ip: '', subnet: '', status: 'down' }
-      ] : type === 'switch' ? [
-        { name: 'FastEthernet0/1', vlan: 1, status: 'down' },
-        { name: 'FastEthernet0/2', vlan: 1, status: 'down' },
-        { name: 'FastEthernet0/3', vlan: 1, status: 'down' },
-        { name: 'FastEthernet0/4', vlan: 1, status: 'down' }
-      ] : [
-        { name: 'Ethernet0', ip: '', subnet: '', gateway: '', status: 'down' }
-      ],
-      config: {
-        runningConfig: [],
-        startupConfig: []
-      }
-    };
+    let addedDevice = null;
 
     setDevices(prev => {
+      const newDevice = {
+        id: `${type}-${Date.now()}`,
+        type,
+        x: position.x,
+        y: position.y,
+        hostname: `${type}${prev.length + 1}`,
+        interfaces: type === 'router' ? [
+          { name: 'GigabitEthernet0/0', ip: '', subnet: '', status: 'down' },
+          { name: 'GigabitEthernet0/1', ip: '', subnet: '', status: 'down' }
+        ] : type === 'switch' ? [
+          { name: 'FastEthernet0/1', vlan: 1, status: 'down' },
+          { name: 'FastEthernet0/2', vlan: 1, status: 'down' },
+          { name: 'FastEthernet0/3', vlan: 1, status: 'down' },
+          { name: 'FastEthernet0/4', vlan: 1, status: 'down' }
+        ] : [
+          { name: 'Ethernet0', ip: '', subnet: '', gateway: '', status: 'down' }
+        ],
+        config: {
+          runningConfig: [],
+          startupConfig: []
+        }
+      };
+
       const updated = [...prev, newDevice];
-      console.log('Devices after add:', updated.length, updated);
+      addedDevice = newDevice;
+      simulator.addDevice(newDevice);
       return updated;
     });
-    simulator.addDevice(newDevice);
-    return newDevice;
-  }, [devices.length, simulator]);
+
+    return addedDevice;
+  }, [simulator]);
 
   // Connect two devices
   const connectDevices = useCallback((device1Id, device2Id, port1, port2) => {

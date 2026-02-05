@@ -21,18 +21,14 @@ export const TopologyCanvas = ({
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const canvasRef = useRef(null);
 
-  console.log('TopologyCanvas render - devices:', devices.length, 'connections:', connections.length);
-
   // Handle canvas click for adding devices
   const handleCanvasClick = useCallback((e) => {
-    console.log('Canvas clicked, mode:', mode);
     if (mode === 'select' || mode === 'cable') return;
 
     const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    console.log('Adding device at:', x, y);
     onDeviceAdd(mode, { x, y });
     setMode('select'); // Return to select mode after adding
   }, [mode, onDeviceAdd]);
@@ -276,7 +272,7 @@ export const TopologyCanvas = ({
             <g
               key={device.id}
               transform={`translate(${device.x}, ${device.y})`}
-              className={`device ${selectedDevice?.id === device.id ? 'selected' : ''}`}
+              className={`svg-device ${selectedDevice?.id === device.id ? 'selected' : ''}`}
               onClick={(e) => handleDeviceClickInternal(device, e)}
               onMouseDown={(e) => handleDeviceDragStart(e, device)}
               style={{ cursor: mode === 'select' ? 'pointer' : 'default' }}

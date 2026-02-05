@@ -43,6 +43,12 @@
   --red-bg:    rgba(217,48,37,.12);
   --amber:     #e8a012;
   --amber-bg:  rgba(232,160,18,.12);
+
+  /* Additional variables for Packet Tracer */
+  --text:      #fffef9;    /* Same as white */
+  --accent:    #e8b00f;    /* Same as gold */
+  --success:   #1ea86a;    /* Same as green */
+  --danger:    #d93025;    /* Same as red */
 }
 
 html, body {
@@ -722,15 +728,15 @@ html, body {
   cursor: crosshair;
 }
 
-.topology-canvas .device {
+.topology-canvas .svg-device {
   transition: all 0.2s ease;
 }
 
-.topology-canvas .device:hover {
+.topology-canvas .svg-device:hover {
   filter: brightness(1.2);
 }
 
-.topology-canvas .device.selected {
+.topology-canvas .svg-device.selected {
   filter: brightness(1.3);
 }
 
