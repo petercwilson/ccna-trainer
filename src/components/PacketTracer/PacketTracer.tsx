@@ -210,22 +210,22 @@ export const PacketTracer: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-text">Packet Tracer Simulator</h2>
-        <div className="flex gap-3">
-          <button
-            className="px-4 py-2 bg-navy-lite hover:bg-navy text-text rounded-lg transition-colors text-sm font-medium"
-            onClick={loadSampleTopology}
-          >
-            Load Sample
-          </button>
-          <button
-            className="px-4 py-2 bg-transparent hover:bg-navy-mid text-text border border-navy rounded-lg transition-colors text-sm font-medium"
-            onClick={clearTopology}
-          >
-            Clear All
-          </button>
-        </div>
+      <div className="section-hdr">
+        <h2>Packet Tracer Simulator</h2>
+      </div>
+      <div className="flex justify-end gap-3 mb-4">
+        <button
+          className="btn btn-gold"
+          onClick={loadSampleTopology}
+        >
+          Load Sample
+        </button>
+        <button
+          className="btn btn-outline"
+          onClick={clearTopology}
+        >
+          Clear All
+        </button>
       </div>
 
       <div className="flex gap-4">
@@ -253,26 +253,30 @@ export const PacketTracer: React.FC = () => {
         )}
       </div>
 
-      <div className="bg-navy-mid border border-navy rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gold mb-4">Quick Start</h3>
-        <ul className="space-y-2 text-text-muted text-sm">
-          <li className="flex items-start">
-            <span className="text-gold mr-2">•</span>
-            <span><strong className="text-text">Add Device:</strong> Click a device icon in the toolbar, then click on canvas</span>
-          </li>
-          <li className="flex items-start">
-            <span className="text-gold mr-2">•</span>
-            <span><strong className="text-text">Connect Devices:</strong> Click "Cable" button, then click two devices to connect</span>
-          </li>
-          <li className="flex items-start">
-            <span className="text-gold mr-2">•</span>
-            <span><strong className="text-text">Configure:</strong> Click a device to open CLI terminal</span>
-          </li>
-          <li className="flex items-start">
-            <span className="text-gold mr-2">•</span>
-            <span><strong className="text-text">Test Connectivity:</strong> Use <code className="px-2 py-0.5 bg-navy-dark rounded text-gold font-mono text-xs">ping</code> command in CLI</span>
-          </li>
-        </ul>
+      <div className="card">
+        <div className="card-head">
+          <h3>Quick Start</h3>
+        </div>
+        <div className="card-body">
+          <ul className="space-y-2 text-text-muted text-sm">
+            <li className="flex items-start">
+              <span className="text-gold mr-2">•</span>
+              <span><strong className="text-text">Add Device:</strong> Click a device icon in the toolbar, then click on canvas</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-gold mr-2">•</span>
+              <span><strong className="text-text">Connect Devices:</strong> Click "Cable" button, then click two devices to connect</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-gold mr-2">•</span>
+              <span><strong className="text-text">Configure:</strong> Click a device to open CLI terminal</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-gold mr-2">•</span>
+              <span><strong className="text-text">Test Connectivity:</strong> Use <code className="px-2 py-0.5 bg-navy-dark rounded text-gold font-mono text-xs">ping</code> command in CLI</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );

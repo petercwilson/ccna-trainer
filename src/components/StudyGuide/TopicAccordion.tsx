@@ -4,33 +4,24 @@ import type { TopicAccordionProps } from '../../types';
 
 export const TopicAccordion: React.FC<TopicAccordionProps> = ({ topics, openTopic, onToggle }) => {
   return (
-    <div className="space-y-3">
+    <div>
       {topics.map(topic => (
-        <div key={topic.id} className="bg-navy-dark rounded-lg overflow-hidden border border-navy">
+        <div key={topic.id} className="accord">
           <button
-            className={`w-full flex items-center justify-between px-6 py-4 text-left transition-colors ${
-              openTopic === topic.id
-                ? 'bg-navy-lite text-gold'
-                : 'hover:bg-navy-mid text-text'
-            }`}
+            className={`accord-head ${openTopic === topic.id ? 'open' : ''}`}
             onClick={() => onToggle(openTopic === topic.id ? null : topic.id)}
             aria-expanded={openTopic === topic.id}
             aria-controls={`topic-${topic.id}`}
             id={`topic-btn-${topic.id}`}
           >
-            <span className="font-semibold">{topic.title}</span>
-            <span
-              className={`text-sm transition-transform ${
-                openTopic === topic.id ? 'rotate-90' : ''
-              }`}
-              aria-hidden="true"
-            >
+            <span>{topic.title}</span>
+            <span className="chevr" aria-hidden="true">
               &#9654;
             </span>
           </button>
           {openTopic === topic.id && (
             <div
-              className="px-6 py-4 bg-navy-dark border-t border-navy"
+              className="accord-body"
               role="region"
               id={`topic-${topic.id}`}
               aria-labelledby={`topic-btn-${topic.id}`}

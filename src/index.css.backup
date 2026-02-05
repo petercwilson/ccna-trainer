@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@300;400;600;700&family=Share+Tech+Mono&display=swap');
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Liberator';
+  src: url('./assets/fonts/Liberator-Heavy.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Liberator';
+  src: url('./assets/fonts/Liberator-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Liberator';
+  src: url('./assets/fonts/Liberator-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Global resets */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  background-color: #022a3a;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0, 0 0 0 0 0.08, 0 0 0 0 0.12, 0 0 0 0.03 0'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)'/%3E%3C/svg%3E");
+  color: #fffef9;
+  font-family: 'Roboto Slab', serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #022a3a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #004d73;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0076a9;
+}
+
+/* Polished button styles */
+.btn {
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-out;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #e8b00f 0%, #b88c0c 100%);
+  color: #022a3a;
+  box-shadow: 0 4px 24px rgba(232, 176, 15, 0.25);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #f2c434 0%, #e8b00f 100%);
+  box-shadow: 0 0 30px rgba(232, 176, 15, 0.4);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #e8b00f;
+  color: #e8b00f;
+  backdrop-filter: blur(4px);
+}
+
+.btn-outline:hover {
+  background: rgba(232, 176, 15, 0.1);
+  border-color: #f2c434;
+}
+
+.btn-ghost {
+  background: rgba(0, 77, 115, 0.3);
+  color: #C6CCD0;
+  backdrop-filter: blur(2px);
+}
+
+.btn-ghost:hover {
+  background: rgba(0, 77, 115, 0.5);
+  color: #fffef9;
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Polished card styles with glassmorphism */
+.card {
+  background: rgba(0, 63, 92, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-header,
+.card-head {
+  padding: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(90deg, rgba(2, 42, 58, 0.5) 0%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Smooth transitions */
+a, button, input, select, textarea {
+  transition: all 0.2s ease;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(232, 176, 15, 0.3);
+  border-top-color: #e8b00f;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(90deg, #e8b00f 0%, #f2c434 50%, #e8b00f 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(0, 77, 115, 0.5);
+  border: 1px solid rgba(232, 176, 15, 0.3);
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.badge:hover {
+  background: rgba(0, 77, 115, 0.7);
+  border-color: rgba(232, 176, 15, 0.5);
+  transform: scale(1.05);
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #022a3a, 0 0 0 4px rgba(232, 176, 15, 0.5);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

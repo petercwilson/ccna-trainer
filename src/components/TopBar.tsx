@@ -42,14 +42,7 @@ export const TopBar = ({ activeTab, onTabChange }: TopBarProps) => {
                 aria-controls={`${nav.id}-panel`}
                 id={`${nav.id}-tab`}
                 onClick={() => onTabChange(nav.id)}
-                className={`
-                  px-4 py-2 font-liberator text-sm font-medium uppercase tracking-[1.8px]
-                  transition-all duration-200 cursor-pointer
-                  ${activeTab === nav.id
-                    ? 'text-gold bg-navy-lite border-b-2 border-gold'
-                    : 'text-text-muted hover:text-text hover:bg-navy-lite/50'
-                  }
-                `}
+                className={`btn ${activeTab === nav.id ? 'btn-gold' : 'btn-ghost'}`}
               >
                 {nav.label}
               </button>

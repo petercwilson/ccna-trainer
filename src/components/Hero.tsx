@@ -31,12 +31,7 @@ export const Hero = () => {
                   key={i}
                   role="listitem"
                   aria-label={badge.label}
-                  className="inline-flex items-center px-4 py-2 rounded-full
-                           bg-navy-lite/50 border border-gold/30
-                           text-sm font-medium text-gold
-                           backdrop-blur-sm
-                           hover:bg-navy-lite/70 hover:border-gold/50
-                           transition-all duration-200"
+                  className="badge"
                 >
                   {badge.text}
                 </span>

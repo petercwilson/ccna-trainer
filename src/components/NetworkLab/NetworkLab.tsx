@@ -21,14 +21,14 @@ export const NetworkLab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-text">Network Lab</h2>
+      <div className="section-hdr">
+        <h2>Network Lab</h2>
       </div>
-      <div className="bg-navy-mid border border-navy rounded-lg overflow-hidden">
-        <div className="bg-navy-lite border-b border-navy px-6 py-4">
-          <h3 className="text-xl font-semibold text-text">Topology Simulator — Click a Device</h3>
+      <div className="card">
+        <div className="card-head">
+          <h3>Topology Simulator — Click a Device</h3>
         </div>
-        <div className="p-6 space-y-6">
+        <div className="card-body space-y-6">
           <div className="relative w-full bg-navy-dark border border-navy rounded-lg overflow-hidden" role="application" aria-label="Network topology simulator">
             <svg
               className="w-full h-auto"
@@ -101,8 +101,8 @@ export const NetworkLab: React.FC = () => {
             const device = topoDevices.find(d => d.id === selectedDevice);
             if (!device) return null;
             return (
-              <div className="bg-navy-dark border border-navy rounded-lg overflow-hidden" role="region" aria-label={`Configuration for ${device.label}`}>
-                <div className="flex items-center justify-between bg-navy-lite border-b border-navy px-4 py-3">
+              <div className="card" role="region" aria-label={`Configuration for ${device.label}`}>
+                <div className="card-head">
                   <span className="text-text font-semibold">{device.label} — Configuration</span>
                   <button
                     className="w-6 h-6 flex items-center justify-center text-text-muted hover:text-danger transition-colors text-xl leading-none"
@@ -118,15 +118,15 @@ export const NetworkLab: React.FC = () => {
           })()}
           <div className="flex items-center gap-3 bg-navy-dark border border-navy rounded-lg p-4" role="toolbar" aria-label="Device types">
             {['Router', 'Switch', 'PC', 'Server'].map(type => (
-              <div
+              <button
                 key={type}
-                className="px-4 py-2 bg-navy-mid hover:bg-navy-lite border border-navy rounded transition-colors cursor-pointer text-text text-sm font-medium"
+                className="btn btn-ghost"
                 role="button"
                 tabIndex={0}
                 aria-label={`Add ${type}`}
               >
                 {type}
-              </div>
+              </button>
             ))}
           </div>
         </div>

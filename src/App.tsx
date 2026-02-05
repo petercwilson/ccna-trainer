@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import { TopBar } from './components/TopBar';
 import { Hero } from './components/Hero';
 import { StudyGuide } from './components/StudyGuide/StudyGuide';
