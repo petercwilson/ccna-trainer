@@ -3,25 +3,26 @@ import { TopologyCanvas } from './TopologyCanvas';
 import { DeviceCLI } from './DeviceCLI';
 import { PacketAnimation } from './PacketAnimation';
 import { NetworkSimulator } from './NetworkSimulator';
+import type { Device, DeviceType, Packet, Connection } from '../../types';
 
 /**
  * Packet Tracer-like network simulator component
  * Allows building topologies, configuring devices, and testing connectivity
  */
-export const PacketTracer = () => {
-  const [devices, setDevices] = useState([]);
-  const [connections, setConnections] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
+export const PacketTracer: React.FC = () => {
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [showCLI, setShowCLI] = useState(false);
-  const [packets, setPackets] = useState([]);
+  const [packets, setPackets] = useState<Packet[]>([]);
   const [simulator] = useState(() => new NetworkSimulator());
 
   // Add device to topology
-  const addDevice = useCallback((type, position) => {
-    let addedDevice = null;
+  const addDevice = useCallback((type: DeviceType, position: { x: number; y: number }): Device | null => {
+    let addedDevice: Device | null = null;
 
     setDevices(prev => {
-      const newDevice = {
+      const newDevice: Device = {
         id: `${type}-${Date.now()}`,
         type,
         x: position.x,
@@ -54,8 +55,8 @@ export const PacketTracer = () => {
   }, [simulator]);
 
   // Connect two devices
-  const connectDevices = useCallback((device1Id, device2Id, port1, port2) => {
-    const connection = {
+  const connectDevices = useCallback((device1Id: string, device2Id: string, port1: number, port2: number) => {
+    const connection: Connection = {
       id: `conn-${Date.now()}`,
       from: device1Id,
       to: device2Id,
@@ -89,7 +90,7 @@ export const PacketTracer = () => {
   }, [simulator]);
 
   // Delete device
-  const deleteDevice = useCallback((deviceId) => {
+  const deleteDevice = useCallback((deviceId: string) => {
     setDevices(prev => prev.filter(d => d.id !== deviceId));
     setConnections(prev => prev.filter(c => c.from !== deviceId && c.to !== deviceId));
     simulator.removeDevice(deviceId);
@@ -100,13 +101,13 @@ export const PacketTracer = () => {
   }, [selectedDevice, simulator]);
 
   // Select device and show CLI
-  const handleDeviceClick = useCallback((device) => {
+  const handleDeviceClick = useCallback((device: Device) => {
     setSelectedDevice(device);
     setShowCLI(true);
   }, []);
 
   // Execute CLI command
-  const executeCommand = useCallback((command) => {
+  const executeCommand = useCallback((command: string) => {
     if (!selectedDevice) return { output: 'No device selected', error: true };
 
     const result = simulator.executeCommand(selectedDevice.id, command);
@@ -114,20 +115,20 @@ export const PacketTracer = () => {
     // Update device state if configuration changed
     if (result.configChanged) {
       setDevices(prev => prev.map(d =>
-        d.id === selectedDevice.id ? result.updatedDevice : d
+        d.id === selectedDevice.id ? result.updatedDevice! : d
       ));
-      setSelectedDevice(result.updatedDevice);
+      setSelectedDevice(result.updatedDevice!);
     }
 
     return result;
   }, [selectedDevice, simulator]);
 
   // Send packet for visualization
-  const sendPacket = useCallback((sourceId, destIp, type = 'icmp') => {
+  const sendPacket = useCallback((sourceId: string, destIp: string, type: 'icmp' | 'tcp' | 'udp' = 'icmp') => {
     const path = simulator.findPath(sourceId, destIp);
 
     if (path.length > 0) {
-      const packet = {
+      const packet: Packet = {
         id: `packet-${Date.now()}`,
         type,
         source: sourceId,
@@ -187,11 +188,13 @@ export const PacketTracer = () => {
 
     // Create connections
     setTimeout(() => {
-      connectDevices(router1.id, switch1.id, 0, 0);
-      connectDevices(router1.id, switch2.id, 1, 0);
-      connectDevices(switch1.id, pc1.id, 1, 0);
-      connectDevices(switch1.id, pc2.id, 2, 0);
-      connectDevices(switch2.id, pc3.id, 1, 0);
+      if (router1 && switch1 && switch2 && pc1 && pc2 && pc3) {
+        connectDevices(router1.id, switch1.id, 0, 0);
+        connectDevices(router1.id, switch2.id, 1, 0);
+        connectDevices(switch1.id, pc1.id, 1, 0);
+        connectDevices(switch1.id, pc2.id, 2, 0);
+        connectDevices(switch2.id, pc3.id, 1, 0);
+      }
     }, 100);
   }, [addDevice, connectDevices, simulator]);
 
@@ -206,21 +209,27 @@ export const PacketTracer = () => {
   }, [simulator]);
 
   return (
-    <div className="packet-tracer">
-      <div className="section-hdr">
-        <h2>Packet Tracer Simulator</h2>
-        <div className="pt-controls">
-          <button className="btn btn-sm" onClick={loadSampleTopology}>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-text">Packet Tracer Simulator</h2>
+        <div className="flex gap-3">
+          <button
+            className="px-4 py-2 bg-navy-lite hover:bg-navy text-text rounded-lg transition-colors text-sm font-medium"
+            onClick={loadSampleTopology}
+          >
             Load Sample
           </button>
-          <button className="btn btn-sm btn-outline" onClick={clearTopology}>
+          <button
+            className="px-4 py-2 bg-transparent hover:bg-navy-mid text-text border border-navy rounded-lg transition-colors text-sm font-medium"
+            onClick={clearTopology}
+          >
             Clear All
           </button>
         </div>
       </div>
 
-      <div className="pt-workspace">
-        <div className="pt-main">
+      <div className="flex gap-4">
+        <div className="flex-1 space-y-4">
           <TopologyCanvas
             devices={devices}
             connections={connections}
@@ -244,13 +253,25 @@ export const PacketTracer = () => {
         )}
       </div>
 
-      <div className="pt-instructions">
-        <h3>Quick Start</h3>
-        <ul>
-          <li><strong>Add Device:</strong> Click a device icon in the toolbar, then click on canvas</li>
-          <li><strong>Connect Devices:</strong> Click "Cable" button, then click two devices to connect</li>
-          <li><strong>Configure:</strong> Click a device to open CLI terminal</li>
-          <li><strong>Test Connectivity:</strong> Use <code>ping</code> command in CLI</li>
+      <div className="bg-navy-mid border border-navy rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gold mb-4">Quick Start</h3>
+        <ul className="space-y-2 text-text-muted text-sm">
+          <li className="flex items-start">
+            <span className="text-gold mr-2">•</span>
+            <span><strong className="text-text">Add Device:</strong> Click a device icon in the toolbar, then click on canvas</span>
+          </li>
+          <li className="flex items-start">
+            <span className="text-gold mr-2">•</span>
+            <span><strong className="text-text">Connect Devices:</strong> Click "Cable" button, then click two devices to connect</span>
+          </li>
+          <li className="flex items-start">
+            <span className="text-gold mr-2">•</span>
+            <span><strong className="text-text">Configure:</strong> Click a device to open CLI terminal</span>
+          </li>
+          <li className="flex items-start">
+            <span className="text-gold mr-2">•</span>
+            <span><strong className="text-text">Test Connectivity:</strong> Use <code className="px-2 py-0.5 bg-navy-dark rounded text-gold font-mono text-xs">ping</code> command in CLI</span>
+          </li>
         </ul>
       </div>
     </div>

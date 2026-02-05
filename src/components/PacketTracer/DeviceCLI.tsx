@@ -1,19 +1,30 @@
 import React, { useState, useRef, useEffect } from 'react';
+import type { DeviceCLIProps } from '../../types';
+
+interface HistoryEntry {
+  type: 'output' | 'command' | 'error';
+  text: string;
+}
+
+interface QuickCommand {
+  label: string;
+  cmd: string;
+}
 
 /**
  * CLI Terminal for configuring devices
  * Simulates Cisco IOS command-line interface
  */
-export const DeviceCLI = ({ device, onExecuteCommand, onClose, onSendPacket }) => {
-  const [history, setHistory] = useState([
+export const DeviceCLI: React.FC<DeviceCLIProps> = ({ device, onExecuteCommand, onClose, onSendPacket }) => {
+  const [history, setHistory] = useState<HistoryEntry[]>([
     { type: 'output', text: `Connected to ${device.hostname}` },
     { type: 'output', text: 'Type "?" for help\n' }
   ]);
   const [input, setInput] = useState('');
-  const [commandHistory, setCommandHistory] = useState([]);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
-  const terminalRef = useRef(null);
-  const inputRef = useRef(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -28,7 +39,7 @@ export const DeviceCLI = ({ device, onExecuteCommand, onClose, onSendPacket }) =
   }, []);
 
   // Handle command submission
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const command = input.trim();
@@ -60,7 +71,7 @@ export const DeviceCLI = ({ device, onExecuteCommand, onClose, onSendPacket }) =
   };
 
   // Handle keyboard navigation through command history
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (commandHistory.length > 0) {
@@ -112,7 +123,7 @@ export const DeviceCLI = ({ device, onExecuteCommand, onClose, onSendPacket }) =
   };
 
   // Quick command buttons
-  const quickCommands = [
+  const quickCommands: QuickCommand[] = [
     { label: 'Show Config', cmd: 'show running-config' },
     { label: 'Show IP', cmd: 'show ip interface brief' },
     { label: 'Show Int', cmd: 'show interfaces' },
@@ -120,14 +131,20 @@ export const DeviceCLI = ({ device, onExecuteCommand, onClose, onSendPacket }) =
   ];
 
   return (
-    <div className="device-cli" role="complementary" aria-label="Device CLI Terminal">
-      <div className="cli-header">
-        <div className="cli-title">
-          <span className="cli-device-name">{device.hostname}</span>
-          <span className="cli-device-type">{device.type}</span>
+    <div
+      className="flex flex-col w-96 bg-navy-dark border border-navy rounded-lg overflow-hidden"
+      role="complementary"
+      aria-label="Device CLI Terminal"
+    >
+      <div className="flex items-center justify-between bg-navy-mid border-b border-navy px-4 py-3">
+        <div className="flex items-center gap-3">
+          <span className="text-text font-semibold">{device.hostname}</span>
+          <span className="px-2 py-0.5 bg-navy-lite text-gold text-xs font-mono rounded">
+            {device.type}
+          </span>
         </div>
         <button
-          className="cli-close"
+          className="w-6 h-6 flex items-center justify-center text-text-muted hover:text-danger transition-colors text-xl leading-none"
           onClick={onClose}
           aria-label="Close CLI terminal"
           title="Close Terminal"
@@ -136,11 +153,11 @@ export const DeviceCLI = ({ device, onExecuteCommand, onClose, onSendPacket }) =
         </button>
       </div>
 
-      <div className="cli-quick-commands">
+      <div className="flex items-center gap-2 bg-navy-mid border-b border-navy px-4 py-2">
         {quickCommands.map((qc, idx) => (
           <button
             key={idx}
-            className="btn btn-xs btn-outline"
+            className="px-2 py-1 text-xs bg-transparent hover:bg-navy-lite text-text border border-navy rounded transition-colors"
             onClick={() => {
               setInput(qc.cmd);
               inputRef.current?.focus();
@@ -154,13 +171,22 @@ export const DeviceCLI = ({ device, onExecuteCommand, onClose, onSendPacket }) =
 
       <div
         ref={terminalRef}
-        className="cli-terminal"
+        className="flex-1 overflow-y-auto bg-navy-dark p-4 font-mono text-sm h-96"
         role="log"
         aria-live="polite"
         aria-label="Terminal output"
       >
         {history.map((entry, idx) => (
-          <div key={idx} className={`cli-line cli-${entry.type}`}>
+          <div
+            key={idx}
+            className={`mb-1 ${
+              entry.type === 'command'
+                ? 'text-gold'
+                : entry.type === 'error'
+                ? 'text-danger'
+                : 'text-text-muted'
+            }`}
+          >
             {entry.text.split('\n').map((line, lineIdx) => (
               <div key={lineIdx}>{line || '\u00A0'}</div>
             ))}
@@ -168,15 +194,15 @@ export const DeviceCLI = ({ device, onExecuteCommand, onClose, onSendPacket }) =
         ))}
 
         {/* Command input */}
-        <form onSubmit={handleSubmit} className="cli-input-form">
-          <span className="cli-prompt">{device.hostname}&gt;</span>
+        <form onSubmit={handleSubmit} className="flex items-center gap-1 mt-2">
+          <span className="text-gold">{device.hostname}&gt;</span>
           <input
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="cli-input"
+            className="flex-1 bg-transparent text-text outline-none border-none"
             autoComplete="off"
             spellCheck="false"
             aria-label="Command input"
@@ -184,8 +210,8 @@ export const DeviceCLI = ({ device, onExecuteCommand, onClose, onSendPacket }) =
         </form>
       </div>
 
-      <div className="cli-footer">
-        <div className="cli-hints">
+      <div className="bg-navy-mid border-t border-navy px-4 py-2">
+        <div className="flex items-center gap-4 text-xs text-text-muted">
           <span>↑↓ Command history</span>
           <span>Tab: Autocomplete</span>
           <span>?: Help</span>

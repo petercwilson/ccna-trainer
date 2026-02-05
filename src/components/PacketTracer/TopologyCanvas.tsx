@@ -1,11 +1,14 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { DeviceIcon } from '../common/DeviceIcon';
+import type { TopologyCanvasProps, DeviceType, Device } from '../../types';
+
+type Mode = 'select' | 'router' | 'switch' | 'pc' | 'server' | 'cable';
 
 /**
  * Canvas for building network topologies
  * Supports drag-and-drop device placement and cable connections
  */
-export const TopologyCanvas = ({
+export const TopologyCanvas: React.FC<TopologyCanvasProps> = ({
   devices,
   connections,
   packets,
@@ -15,27 +18,31 @@ export const TopologyCanvas = ({
   onConnect,
   selectedDevice
 }) => {
-  const [mode, setMode] = useState('select'); // 'select', 'router', 'switch', 'pc', 'server', 'cable'
-  const [cableStart, setCableStart] = useState(null);
-  const [draggedDevice, setDraggedDevice] = useState(null);
+  const [mode, setMode] = useState<Mode>('select');
+  const [cableStart, setCableStart] = useState<Device | null>(null);
+  const [draggedDevice, setDraggedDevice] = useState<Device | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<SVGSVGElement>(null);
 
   // Handle canvas click for adding devices
-  const handleCanvasClick = useCallback((e) => {
+  const handleCanvasClick = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
     if (mode === 'select' || mode === 'cable') return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    onDeviceAdd(mode, { x, y });
+    onDeviceAdd(mode as DeviceType, { x, y });
     setMode('select'); // Return to select mode after adding
   }, [mode, onDeviceAdd]);
 
   // Handle device drag start
-  const handleDeviceDragStart = useCallback((e, device) => {
-    const rect = canvasRef.current.getBoundingClientRect();
+  const handleDeviceDragStart = useCallback((e: React.MouseEvent, device: Device) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
     const offsetX = e.clientX - rect.left - device.x;
     const offsetY = e.clientY - rect.top - device.y;
 
@@ -45,10 +52,12 @@ export const TopologyCanvas = ({
   }, []);
 
   // Handle device drag
-  const handleCanvasMouseMove = useCallback((e) => {
+  const handleCanvasMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
     if (!draggedDevice) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
     const x = e.clientX - rect.left - dragOffset.x;
     const y = e.clientY - rect.top - dragOffset.y;
 
@@ -62,7 +71,7 @@ export const TopologyCanvas = ({
   }, []);
 
   // Handle device click for cable mode or selection
-  const handleDeviceClickInternal = useCallback((device, e) => {
+  const handleDeviceClickInternal = useCallback((device: Device, e: React.MouseEvent) => {
     e.stopPropagation();
 
     if (mode === 'cable') {
@@ -100,10 +109,9 @@ export const TopologyCanvas = ({
           y1={from.y + 30}
           x2={to.x + 30}
           y2={to.y + 30}
-          stroke="var(--accent)"
+          className="stroke-gold opacity-60"
           strokeWidth="2"
           strokeDasharray="5,5"
-          opacity="0.6"
         />
       );
     });
@@ -125,8 +133,7 @@ export const TopologyCanvas = ({
           cx={device.x + 30}
           cy={device.y + 30}
           r="8"
-          fill="var(--success)"
-          opacity="0.8"
+          className="fill-success opacity-80"
         >
           <animate
             attributeName="r"
@@ -140,73 +147,101 @@ export const TopologyCanvas = ({
   };
 
   return (
-    <div className="topology-canvas-container">
+    <div className="flex flex-col gap-4">
       {/* Toolbar */}
-      <div className="pt-toolbar" role="toolbar" aria-label="Device tools">
+      <div
+        className="flex items-center gap-2 bg-navy-mid border border-navy rounded-lg p-3"
+        role="toolbar"
+        aria-label="Device tools"
+      >
         <button
-          className={`btn btn-sm ${mode === 'select' ? 'btn-primary' : 'btn-outline'}`}
+          className={`px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+            mode === 'select'
+              ? 'bg-gold text-navy-dark'
+              : 'bg-transparent text-text hover:bg-navy-lite border border-navy'
+          }`}
           onClick={() => setMode('select')}
           aria-label="Select mode"
           title="Select Mode"
         >
-          <span>Select</span>
+          Select
         </button>
 
-        <div className="toolbar-divider" />
+        <div className="w-px h-6 bg-navy" />
 
         <button
-          className={`btn btn-sm btn-icon ${mode === 'router' ? 'btn-primary' : 'btn-outline'}`}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+            mode === 'router'
+              ? 'bg-gold text-navy-dark'
+              : 'bg-transparent text-text hover:bg-navy-lite border border-navy'
+          }`}
           onClick={() => setMode('router')}
           aria-label="Add router"
           title="Add Router"
         >
           <DeviceIcon type="router" size={20} />
-          <span className="btn-label">Router</span>
+          <span>Router</span>
         </button>
 
         <button
-          className={`btn btn-sm btn-icon ${mode === 'switch' ? 'btn-primary' : 'btn-outline'}`}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+            mode === 'switch'
+              ? 'bg-gold text-navy-dark'
+              : 'bg-transparent text-text hover:bg-navy-lite border border-navy'
+          }`}
           onClick={() => setMode('switch')}
           aria-label="Add switch"
           title="Add Switch"
         >
           <DeviceIcon type="switch" size={20} />
-          <span className="btn-label">Switch</span>
+          <span>Switch</span>
         </button>
 
         <button
-          className={`btn btn-sm btn-icon ${mode === 'pc' ? 'btn-primary' : 'btn-outline'}`}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+            mode === 'pc'
+              ? 'bg-gold text-navy-dark'
+              : 'bg-transparent text-text hover:bg-navy-lite border border-navy'
+          }`}
           onClick={() => setMode('pc')}
           aria-label="Add PC"
           title="Add PC"
         >
           <DeviceIcon type="pc" size={20} />
-          <span className="btn-label">PC</span>
+          <span>PC</span>
         </button>
 
         <button
-          className={`btn btn-sm btn-icon ${mode === 'server' ? 'btn-primary' : 'btn-outline'}`}
+          className={`flex items-center gap-2 px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+            mode === 'server'
+              ? 'bg-gold text-navy-dark'
+              : 'bg-transparent text-text hover:bg-navy-lite border border-navy'
+          }`}
           onClick={() => setMode('server')}
           aria-label="Add server"
           title="Add Server"
         >
           <DeviceIcon type="server" size={20} />
-          <span className="btn-label">Server</span>
+          <span>Server</span>
         </button>
 
-        <div className="toolbar-divider" />
+        <div className="w-px h-6 bg-navy" />
 
         <button
-          className={`btn btn-sm ${mode === 'cable' ? 'btn-primary' : 'btn-outline'}`}
+          className={`px-3 py-1.5 rounded transition-colors text-sm font-medium ${
+            mode === 'cable'
+              ? 'bg-gold text-navy-dark'
+              : 'bg-transparent text-text hover:bg-navy-lite border border-navy'
+          }`}
           onClick={() => { setMode('cable'); setCableStart(null); }}
           aria-label="Cable connection mode"
           title="Connect Devices"
         >
-          <span>Cable</span>
+          Cable
         </button>
 
         {mode !== 'select' && (
-          <div className="toolbar-hint">
+          <div className="ml-auto text-sm text-text-muted italic">
             {mode === 'cable' ? 'Click two devices to connect' : 'Click on canvas to place device'}
           </div>
         )}
@@ -215,7 +250,7 @@ export const TopologyCanvas = ({
       {/* Canvas */}
       <svg
         ref={canvasRef}
-        className="topology-canvas"
+        className="w-full h-[600px] bg-navy-dark border border-navy rounded-lg"
         onClick={handleCanvasClick}
         onMouseMove={handleCanvasMouseMove}
         onMouseUp={handleCanvasMouseUp}
@@ -252,10 +287,9 @@ export const TopologyCanvas = ({
             y1={cableStart.y + 30}
             x2={cableStart.x + 30}
             y2={cableStart.y + 30}
-            stroke="var(--accent)"
+            className="stroke-gold opacity-40"
             strokeWidth="2"
             strokeDasharray="5,5"
-            opacity="0.4"
           >
             <animate
               attributeName="opacity"
@@ -284,9 +318,8 @@ export const TopologyCanvas = ({
                   cy="30"
                   r="35"
                   fill="none"
-                  stroke="var(--accent)"
+                  className="stroke-gold opacity-60"
                   strokeWidth="2"
-                  opacity="0.6"
                 >
                   <animate
                     attributeName="r"
@@ -343,9 +376,7 @@ export const TopologyCanvas = ({
                 x="30"
                 y="70"
                 textAnchor="middle"
-                fill="var(--text)"
-                fontSize="12"
-                fontWeight="500"
+                className="fill-text text-xs font-medium"
               >
                 {device.hostname}
               </text>
@@ -357,24 +388,21 @@ export const TopologyCanvas = ({
                   cx={30 + (idx - device.interfaces.length / 2 + 0.5) * 12}
                   cy="55"
                   r="3"
-                  fill={iface.status === 'up' ? 'var(--success)' : 'var(--muted)'}
-                  opacity="0.8"
+                  className={iface.status === 'up' ? 'fill-success opacity-80' : 'fill-text-muted opacity-50'}
                 />
               ))}
 
               {/* Delete button (on hover in select mode) */}
               {mode === 'select' && (
                 <g
-                  className="device-delete"
+                  className="device-delete opacity-0 hover:opacity-100 transition-opacity"
                   onClick={(e) => {
                     e.stopPropagation();
                     onDeviceDelete(device.id);
                   }}
-                  style={{ cursor: 'pointer', opacity: 0 }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = 0}
+                  style={{ cursor: 'pointer' }}
                 >
-                  <circle cx="50" cy="10" r="8" fill="var(--danger)" />
+                  <circle cx="50" cy="10" r="8" className="fill-danger" />
                   <text x="50" y="14" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">
                     ×
                   </text>
@@ -386,11 +414,11 @@ export const TopologyCanvas = ({
       </svg>
 
       {/* Canvas info */}
-      <div className="canvas-info">
+      <div className="flex items-center gap-4 text-sm text-text-muted px-4">
         <span>{devices.length} devices</span>
         <span>{connections.length} connections</span>
         {mode === 'cable' && cableStart && (
-          <span className="text-accent">Cable from: {cableStart.hostname}</span>
+          <span className="text-gold">Cable from: {cableStart.hostname}</span>
         )}
       </div>
     </div>

@@ -8,6 +8,7 @@ import { PacketTracer } from './components/PacketTracer/PacketTracer';
 import { ErrorBoundary, ErrorFallback } from './components/ErrorBoundary';
 import { examQuestions } from './data/examQuestions';
 import { studyGuides } from './data/studyGuides';
+import type { TabId, QuizQuestion, ExamResult, Progress } from './types';
 import {
   getProgress,
   setProgress,
@@ -18,19 +19,19 @@ import {
 } from './utils/storage';
 
 // Simplified Quiz/Practice component (keeping original logic for now)
-const PracticeQuiz = () => {
+const PracticeQuiz: React.FC = () => {
   const [cat, setCat] = useState('network-fundamentals');
   const [tpIdx, setTpIdx] = useState(0);
-  const [tpAns, setTpAns] = useState(() => getTopicAnswers());
-  const [tpShow, setTpShow] = useState(() => getTopicShown());
+  const [tpAns, setTpAns] = useState<Record<number, number>>(() => getTopicAnswers());
+  const [tpShow, setTpShow] = useState<Record<number, boolean>>(() => getTopicShown());
   const [examMode, setExamMode] = useState(false);
-  const [examQs, setExamQs] = useState([]);
+  const [examQs, setExamQs] = useState<QuizQuestion[]>([]);
   const [examStarted, setExamStarted] = useState(false);
   const [examDone, setExamDone] = useState(false);
   const [exIdx, setExIdx] = useState(0);
-  const [exAns, setExAns] = useState({});
+  const [exAns, setExAns] = useState<Record<number, number>>({});
   const [exScore, setExScore] = useState(0);
-  const [progress, setProgressState] = useState(() => getProgress());
+  const [progress, setProgressState] = useState<Progress>(() => getProgress());
 
   // Save progress to localStorage when it changes
   useEffect(() => {
@@ -62,7 +63,13 @@ const PracticeQuiz = () => {
     setProgressState(p);
   };
 
-  const renderOpt = (option, idx, { isExam, revealed, answerIdx, correctIdx, onPick }) => {
+  const renderOpt = (option: string, idx: number, { isExam, revealed, answerIdx, correctIdx, onPick }: {
+    isExam: boolean;
+    revealed?: boolean;
+    answerIdx?: number;
+    correctIdx?: number;
+    onPick: (idx: number) => void;
+  }) => {
     let cls = 'opt';
     if (isExam) { if (answerIdx===idx) cls+=' sel'; }
     else { if (revealed) { if (idx===correctIdx) cls+=' correct'; else if (idx===answerIdx) cls+=' wrong'; } else if (answerIdx===idx) cls+=' sel'; }
@@ -125,8 +132,8 @@ const PracticeQuiz = () => {
         <div className="card">
           <div className="card-head"><h3>Question {exIdx+1} of {examQs.length}</h3><button className="btn btn-green" onClick={submitExam} aria-label="Submit exam for grading">Submit Exam</button></div>
           <div className="card-body">
-            <div className="progress-track" role="progressbar" aria-valuenow={exIdx+1} aria-valuemin="1" aria-valuemax={examQs.length} aria-label={`Question ${exIdx+1} of ${examQs.length}`}><div className="progress-fill" style={{width:`${(exIdx+1)/examQs.length*100}%`}}/></div>
-            <div className="q-text" role="heading" aria-level="3">{q.question}</div>
+            <div className="progress-track" role="progressbar" aria-valuenow={exIdx+1} aria-valuemin={1} aria-valuemax={examQs.length} aria-label={`Question ${exIdx+1} of ${examQs.length}`}><div className="progress-fill" style={{width:`${(exIdx+1)/examQs.length*100}%`}}/></div>
+            <div className="q-text" role="heading" aria-level={3}>{q.question}</div>
             <div className="options" role="radiogroup" aria-label="Answer options">{q.options.map((o,i) => renderOpt(o,i,{ isExam:true, answerIdx:exAns[exIdx], onPick:i=>setExAns({...exAns,[exIdx]:i}) }))}</div>
             <div className="btn-row">
               <button className="btn btn-ghost" disabled={exIdx===0} onClick={()=>setExIdx(exIdx-1)} aria-label="Go to previous question">← Previous</button>
@@ -143,11 +150,11 @@ const PracticeQuiz = () => {
     <>
       <div className="section-hdr"><h2>Practice</h2></div>
       <div className="mode-grid">
-        <div className="mode-card" onClick={()=>setExamMode(false)} role="button" tabIndex="0" aria-label="Practice topic by topic with instant feedback">
+        <div className="mode-card" onClick={()=>setExamMode(false)} role="button" tabIndex={0} aria-label="Practice topic by topic with instant feedback">
           <div className="mc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c434" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h5a3 3 0 0 1 3 3v11a2 2 0 0 0-2-1H2z"/><path d="M22 3h-5a3 3 0 0 0-3 3v11a2 2 0 0 1 2-1h6z"/></svg></div>
           <h3>Topic by Topic</h3><p>Instant feedback after each answer</p>
         </div>
-        <div className="mode-card" onClick={()=>{setExamMode(true);setExamStarted(false);setExamDone(false);}} role="button" tabIndex="0" aria-label="Take a timed practice exam">
+        <div className="mode-card" onClick={()=>{setExamMode(true);setExamStarted(false);setExamDone(false);}} role="button" tabIndex={0} aria-label="Take a timed practice exam">
           <div className="mc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#f2c434" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
           <h3>Timed Exam</h3><p>Simulate the real CCNA exam</p>
         </div>
@@ -163,8 +170,8 @@ const PracticeQuiz = () => {
               </select>
             </div>
             <div className="q-meta"><span className="q-counter" aria-label={`Question ${tpIdx+1} of ${filteredQs.length}`}>{tpIdx+1} / {filteredQs.length}</span><span className={`q-badge ${q.difficulty}`} aria-label={`Difficulty: ${q.difficulty}`}>{q.difficulty}</span></div>
-            <div className="progress-track" role="progressbar" aria-valuenow={tpIdx+1} aria-valuemin="1" aria-valuemax={filteredQs.length}><div className="progress-fill" style={{width:`${(tpIdx+1)/filteredQs.length*100}%`}}/></div>
-            <div className="q-text" role="heading" aria-level="3">{q.question}</div>
+            <div className="progress-track" role="progressbar" aria-valuenow={tpIdx+1} aria-valuemin={1} aria-valuemax={filteredQs.length}><div className="progress-fill" style={{width:`${(tpIdx+1)/filteredQs.length*100}%`}}/></div>
+            <div className="q-text" role="heading" aria-level={3}>{q.question}</div>
             <div className="options" role="radiogroup" aria-label="Answer options">{q.options.map((o,i) => renderOpt(o,i,{ isExam:false, revealed:!!tpShow[tpIdx], answerIdx:tpAns[tpIdx], correctIdx:q.correctAnswer, onPick:i=>{ if(!tpShow[tpIdx]) setTpAns({...tpAns,[tpIdx]:i}); } }))}</div>
             {tpAns[tpIdx]!==undefined && !tpShow[tpIdx] && <button className="btn btn-gold btn-full" onClick={()=>setTpShow({...tpShow,[tpIdx]:true})} aria-label="Check your answer">Check Answer</button>}
             {tpShow[tpIdx] && (
@@ -185,14 +192,14 @@ const PracticeQuiz = () => {
 };
 
 // Simplified Progress component
-const ProgressView = () => {
-  const [tpAns] = useState(() => getTopicAnswers());
-  const [progress] = useState(() => getProgress());
+const ProgressView: React.FC = () => {
+  const [tpAns] = useState<Record<number, number>>(() => getTopicAnswers());
+  const [progress] = useState<Progress>(() => getProgress());
 
   const totalAns = Object.keys(tpAns).length;
   const totalRight = Object.keys(tpAns).filter(i => {
     const q = examQuestions[parseInt(i)];
-    return q && tpAns[i] === q.correctAnswer;
+    return q && tpAns[parseInt(i)] === q.correctAnswer;
   }).length;
 
   return (
@@ -206,8 +213,8 @@ const ProgressView = () => {
       <div className="card">
         <div className="card-head"><h3>Exam History</h3></div>
         {progress.exams && progress.exams.length>0 ? progress.exams.slice().reverse().map((e,i) => (
-          <div key={i} className="history-row" role="article" aria-label={`Mock exam ${progress.exams.length-i}, score ${e.percentage}%`}>
-            <div><div className="hr-title">Mock Exam #{progress.exams.length-i}</div><div className="hr-date">{new Date(e.date).toLocaleDateString()}</div></div>
+          <div key={i} className="history-row" role="article" aria-label={`Mock exam ${progress.exams!.length-i}, score ${e.percentage}%`}>
+            <div><div className="hr-title">Mock Exam #{progress.exams!.length-i}</div><div className="hr-date">{new Date(e.date).toLocaleDateString()}</div></div>
             <div style={{textAlign:'right'}}><div className={`hr-score ${e.percentage>=80?'pass':e.percentage>=60?'mid':'fail'}`}>{e.percentage}%</div><div className="hr-sub">{e.score} / {e.total}</div></div>
           </div>
         )) : (
@@ -224,7 +231,7 @@ const ProgressView = () => {
 
 /* ═══ MAIN APP ═══ */
 export default function CCNATrainer() {
-  const [tab, setTab] = useState('study');
+  const [tab, setTab] = useState<TabId>('study');
 
   return (
     <ErrorBoundary friendlyMessage="The CCNA Trainer application encountered an unexpected error. Please refresh the page to continue.">
